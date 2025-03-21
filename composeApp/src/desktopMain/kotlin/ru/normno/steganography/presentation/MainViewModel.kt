@@ -8,10 +8,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.normno.steganography.domain.repository.FileRepository
+import ru.normno.steganography.util.KJBSteganography
 
 class MainViewModel(
     private val fileRepository: FileRepository,
 ) : ViewModel() {
+    private val kjbSteganography = KJBSteganography(1.0, 1)
+
     val state: StateFlow<MainState>
         field = MutableStateFlow(MainState())
 
