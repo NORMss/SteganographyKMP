@@ -1,6 +1,9 @@
 package ru.normno.steganography.util
 
 import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import javax.imageio.ImageIO
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -74,6 +77,17 @@ class KJBSteganography(private val lambda: Double, private val seed: Int) {
         return bitsToTextWithMarker(bits)
     }
 
+    fun imageToByteArray(image: BufferedImage, format: String = "PNG"): ByteArray {
+        val baos = ByteArrayOutputStream()
+        ImageIO.write(image, format, baos)
+        return baos.toByteArray()
+    }
+
+    fun byteArrayToImage(bytes: ByteArray): BufferedImage {
+        val bais = ByteArrayInputStream(bytes)
+        return ImageIO.read(bais)
+    }
+
     private fun textToBitsWithMarker(text: String): List<Int> {
         val data = text.toByteArray(Charsets.UTF_8) + endMarker
         return data.flatMap { byte ->
@@ -87,8 +101,7 @@ class KJBSteganography(private val lambda: Double, private val seed: Int) {
         }.toByteArray()
 
         val markerIndex = bytes.indices.find { i ->
-            i + endMarker.size <= bytes.size && bytes.copyOfRange(i, i + endMarker.size)
-                .contentEquals(endMarker)
+            i + endMarker.size <= bytes.size && bytes.copyOfRange(i, i + endMarker.size).contentEquals(endMarker)
         } ?: -1
 
         return if (markerIndex >= 0) {
