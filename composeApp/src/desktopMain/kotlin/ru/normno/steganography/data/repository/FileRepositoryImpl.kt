@@ -4,11 +4,13 @@ import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.FileKitMode
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.openFilePicker
+import ru.normno.steganography.data.file.FileManager
 import ru.normno.steganography.domain.repository.FileRepository
 import java.io.FileInputStream
 
 class FileRepositoryImpl(
     private val fileKit: FileKit,
+    private val fileManager: FileManager,
 ) : FileRepository {
     override suspend fun getImage(): ByteArray? {
         val file = fileKit.openFilePicker(
@@ -20,5 +22,13 @@ class FileRepositoryImpl(
                 it.readBytes()
             }
         }
+    }
+
+    override suspend fun saveImage(folder: String, file: String, byteArray: ByteArray) {
+        fileManager.saveFile(
+            folder = folder,
+            file = file,
+            byteArray = byteArray,
+        )
     }
 }

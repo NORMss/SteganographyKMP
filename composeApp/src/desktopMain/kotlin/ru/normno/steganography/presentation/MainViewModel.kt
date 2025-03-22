@@ -72,6 +72,7 @@ class MainViewModel(
                         }
                     }
                 }
+            onSaveFile()
             state.update {
                 it.copy(
                     isEbbing = false,
@@ -100,6 +101,18 @@ class MainViewModel(
             state.update {
                 it.copy(
                     isExtracting = false,
+                )
+            }
+        }
+    }
+
+    fun onSaveFile() {
+        viewModelScope.launch(Dispatchers.IO) {
+            state.value.resultImageBytes?.let { imageBytes ->
+                fileRepository.saveImage(
+                    folder = "",
+                    file = "photo.png",
+                    byteArray = imageBytes,
                 )
             }
         }
