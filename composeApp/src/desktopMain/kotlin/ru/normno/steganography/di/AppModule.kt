@@ -17,10 +17,9 @@ object AppModule {
     }
 
     private val appModule = module {
-        single<FileRepository> { FileRepositoryImpl(fileKit = fileKit, fileManager = fileManager) }
+        single<FileRepository> { FileRepositoryImpl(fileKit = fileKit) }
         viewModelOf(::MainViewModel)
     }
 
     private val fileKit = FileKit
-    private val fileManager = FileManager()
 }

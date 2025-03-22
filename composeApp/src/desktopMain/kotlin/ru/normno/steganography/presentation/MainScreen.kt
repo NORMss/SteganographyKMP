@@ -31,15 +31,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import ru.normno.steganography.domain.model.FileInfo
 
 @Composable
 fun MainScreen(
     state: MainState,
-    onPickImage: () -> Unit,
+    onPickSourceImage: () -> Unit,
+    onPickModifiedImage: () -> Unit,
     onEmbedData: () -> Unit,
     onExtractData: () -> Unit,
+    onSaveModifiedImage: () -> Unit,
     setEmbedText: (String) -> Unit,
 ) {
     Column(
@@ -71,7 +75,7 @@ fun MainScreen(
                 )
                 Button(
                     onClick = onEmbedData,
-                    enabled = !state.isEbbing && state.sourceImageBytes != null
+                    enabled = !state.isEbbing && state.sourceFileInfo != null
                 ) {
                     Text(
                         text = "Embed text"
@@ -87,6 +91,11 @@ fun MainScreen(
                     .weight(2f),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                Text(
+                    text = state.sourceFileInfo?.filename ?: "",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
                 Box(
                     modifier = Modifier
                         .border(1.dp, Color.Black, RoundedCornerShape(8.dp))
@@ -94,7 +103,7 @@ fun MainScreen(
                         .heightIn(max = 720.dp)
                         .fillMaxSize()
                         .onClick {
-                            onPickImage()
+                            onPickSourceImage()
                         },
                 ) {
                     Text(
@@ -103,7 +112,7 @@ fun MainScreen(
                             .align(Alignment.Center),
                     )
                     AsyncImage(
-                        model = state.sourceImageBytes,
+                        model = state.sourceFileInfo?.byteArray,
                         contentDescription = null,
                         contentScale = ContentScale.Fit,
                         modifier = Modifier
@@ -114,7 +123,8 @@ fun MainScreen(
                     )
                 }
                 Text(
-                    text = state.sourceImageBytes?.let { "File size ${it.size / 1024} kb" } ?: ""
+                    text = state.sourceFileInfo?.byteArray?.let { "File size ${it.size / 1024} kb" }
+                        ?: ""
                 )
             }
             Spacer(
@@ -126,20 +136,28 @@ fun MainScreen(
                     .weight(2f),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                Text(
+                    text = state.resultFileInfo?.filename ?: "",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
                 Box(
                     modifier = Modifier
                         .border(1.dp, Color.Black, RoundedCornerShape(8.dp))
                         .aspectRatio(1f)
                         .heightIn(max = 720.dp)
-                        .fillMaxSize(),
+                        .fillMaxSize()
+                        .onClick {
+                            onPickModifiedImage()
+                        },
                 ) {
                     Text(
-                        text = "Image after data injection",
+                        text = "Click to select an image with embedded data",
                         modifier = Modifier
                             .align(Alignment.Center),
                     )
                     AsyncImage(
-                        model = state.resultImageBytes,
+                        model = state.resultFileInfo?.byteArray,
                         contentDescription = null,
                         contentScale = ContentScale.Fit,
                         modifier = Modifier
@@ -150,7 +168,8 @@ fun MainScreen(
                     )
                 }
                 Text(
-                    text = state.resultImageBytes?.let { "File size ${it.size / 1024} kb" } ?: ""
+                    text = state.resultFileInfo?.byteArray?.let { "File size ${it.size / 1024} kb" }
+                        ?: ""
                 )
             }
             Spacer(
@@ -168,7 +187,8 @@ fun MainScreen(
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState())
                         .heightIn(min = 128.dp, max = 256.dp)
-                        .padding(8.dp),
+                        .padding(8.dp)
+                        .weight(1f),
                 ) {
                     Text(
                         text = state.extractText.ifBlank { "Extracted text" },
@@ -184,10 +204,34 @@ fun MainScreen(
                 )
                 Button(
                     onClick = onExtractData,
-                    enabled = state.resultImageBytes != null && !state.isExtracting
+                    enabled = state.resultFileInfo != null && !state.isExtracting
                 ) {
                     Text(
                         text = "Extract text"
+                    )
+                }
+                Spacer(
+                    modifier = Modifier
+                        .height(8.dp),
+                )
+                TextField(
+                    value = state.resultFileInfo?.filename ?: "",
+                    onValueChange = {},
+                    enabled = state.resultFileInfo != null,
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    singleLine = true,
+                )
+                Spacer(
+                    modifier = Modifier
+                        .height(8.dp),
+                )
+                Button(
+                    onClick = onSaveModifiedImage,
+                    enabled = state.resultFileInfo != null,
+                ) {
+                    Text(
+                        text = "Save"
                     )
                 }
             }
@@ -198,12 +242,17 @@ fun MainScreen(
 @Preview
 @Composable
 fun MainScreenPreview() {
-    val state = MainState(sourceImageBytes = byteArrayOf(1, 2, 3))
+    val state = MainState(
+        sourceFileInfo = FileInfo("TestName.png", byteArrayOf()),
+        resultFileInfo = FileInfo("TestName.png", byteArrayOf()),
+    )
     MainScreen(
         state = state,
-        onPickImage = {},
+        onPickSourceImage = {},
+        onPickModifiedImage = {},
         onEmbedData = {},
         onExtractData = {},
         setEmbedText = {},
+        onSaveModifiedImage = {},
     )
 }

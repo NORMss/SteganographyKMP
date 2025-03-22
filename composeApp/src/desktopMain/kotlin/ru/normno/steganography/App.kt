@@ -15,9 +15,11 @@ fun App() {
     MaterialTheme {
         MainScreen(
             state = state,
-            onPickImage = viewModel::onPickImage,
+            onPickSourceImage = viewModel::onPickSourceImage,
+            onPickModifiedImage = viewModel::onPickModifiedImage,
             onEmbedData = viewModel::onEmbedData,
             onExtractData = viewModel::onExtractData,
+            onSaveModifiedImage = viewModel::onSaveModifiedImage,
             setEmbedText = viewModel::setEmbedText,
         )
     }

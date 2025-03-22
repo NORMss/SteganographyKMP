@@ -1,6 +1,8 @@
 package ru.normno.steganography.domain.repository
 
+import ru.normno.steganography.domain.model.FileInfo
+
 interface FileRepository {
-    suspend fun getImage(): ByteArray?
-    suspend fun saveImage(folder: String, file: String, byteArray: ByteArray)
+    suspend fun getImage(): FileInfo?
+    suspend fun saveImage(filename: String, byteArray: ByteArray)
 }
