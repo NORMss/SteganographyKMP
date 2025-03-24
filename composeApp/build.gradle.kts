@@ -17,6 +17,8 @@ kotlin {
         val desktopMain by getting
         
         commonMain.dependencies {
+            implementation(libs.kotlin.reflect)
+
             implementation(libs.bundles.koin)
 
             implementation(libs.filekit.core)

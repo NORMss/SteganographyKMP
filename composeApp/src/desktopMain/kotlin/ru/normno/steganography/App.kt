@@ -21,6 +21,8 @@ fun App() {
             onExtractData = viewModel::onExtractData,
             onSaveModifiedImage = viewModel::onSaveModifiedImage,
             setEmbedText = viewModel::setEmbedText,
+            setFileName = viewModel::setFileName,
+            onSelectImageFormat = viewModel::onSelectImageFormat,
         )
     }
 }

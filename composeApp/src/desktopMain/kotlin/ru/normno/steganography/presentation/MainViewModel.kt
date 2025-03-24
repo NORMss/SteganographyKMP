@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.normno.steganography.domain.model.FileInfo
 import ru.normno.steganography.domain.repository.FileRepository
+import ru.normno.steganography.util.ImageFormat
 import ru.normno.steganography.util.KJBSteganography
 
 class MainViewModel(
@@ -30,10 +31,26 @@ class MainViewModel(
             )
     }
 
+    fun onSelectImageFormat(format: ImageFormat) {
+        state.update {
+            it.copy(
+                selectedImageFormat = format,
+            )
+        }
+    }
+
     fun setEmbedText(text: String) {
         state.update {
             it.copy(
                 embedText = text,
+            )
+        }
+    }
+
+    fun setFileName(text: String) {
+        state.update {
+            it.copy(
+                resultFileInfo = it.resultFileInfo?.copy(filename = text)
             )
         }
     }
@@ -43,7 +60,15 @@ class MainViewModel(
             val fileInfo = fileRepository.getImage()
             state.update {
                 it.copy(
-                    sourceFileInfo = fileInfo
+                    sourceFileInfo = fileInfo,
+                    selectedImageFormat = fileInfo?.filename?.let { filename ->
+                        when (filename.substringAfterLast(".").uppercase()) {
+                            "PNG" -> ImageFormat.PNG()
+                            "JPEG" -> ImageFormat.JPEG()
+                            "JPG" -> ImageFormat.JPG()
+                            else -> ImageFormat.PNG()
+                        }
+                    } ?: ImageFormat.PNG(),
                 )
             }
         }
@@ -71,13 +96,15 @@ class MainViewModel(
                 val cover = kjbSteganography.byteArrayToImage(sourceFileInfo.byteArray)
                 kjbSteganography.embedData(cover = cover, message = state.value.embedText)
                     ?.also { bufferedImage ->
-                        val image = kjbSteganography.imageToByteArray(bufferedImage)
+                        val image = kjbSteganography.imageToByteArray(
+                            image = bufferedImage,
+                            format = state.value.selectedImageFormat
+                        )
                         state.update {
                             it.copy(
                                 resultFileInfo = FileInfo(
                                     filename = sourceFileInfo.filename.substringBeforeLast(".")
-                                            + "_modified"
-                                            + ".${sourceFileInfo.filename.substringAfterLast(".")}",
+                                            + "_modified",
                                     byteArray = image,
                                 )
                             )
@@ -122,7 +149,7 @@ class MainViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             state.value.resultFileInfo?.let { resultFileInfo ->
                 fileRepository.saveImage(
-                    filename = resultFileInfo.filename,
+                    filename = resultFileInfo.filename + ".${state.value.selectedImageFormat.formatName.lowercase()}",
                     byteArray = resultFileInfo.byteArray,
                 )
             }

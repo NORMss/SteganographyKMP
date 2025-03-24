@@ -22,12 +22,22 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -35,6 +45,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import ru.normno.steganography.domain.model.FileInfo
+import ru.normno.steganography.util.ImageFormat
 
 @Composable
 fun MainScreen(
@@ -44,8 +55,15 @@ fun MainScreen(
     onEmbedData: () -> Unit,
     onExtractData: () -> Unit,
     onSaveModifiedImage: () -> Unit,
+    onSelectImageFormat: (ImageFormat) -> Unit,
     setEmbedText: (String) -> Unit,
-) {
+    setFileName: (String) -> Unit,
+
+    ) {
+    var isSelectImageFormat by remember {
+        mutableStateOf(false)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -80,6 +98,61 @@ fun MainScreen(
                     Text(
                         text = "Embed text"
                     )
+                }
+                Spacer(
+                    modifier = Modifier
+                        .height(8.dp),
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onClick {
+                                if (state.sourceFileInfo != null) {
+                                    isSelectImageFormat = true
+                                }
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = state.selectedImageFormat.formatName,
+                            color = if (state.sourceFileInfo != null)
+                                MaterialTheme.colors.onBackground
+                            else
+                                MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .width(4.dp),
+                        )
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .rotate(if (isSelectImageFormat) 180f else 0f),
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = isSelectImageFormat,
+                        onDismissRequest = { isSelectImageFormat = false },
+                    ) {
+                        listOf(
+                            ImageFormat.PNG(),
+                            ImageFormat.JPG(),
+                            ImageFormat.JPEG(),
+                            ImageFormat.BMP(),
+                        ).forEach { format ->
+                            DropdownMenuItem(onClick = { onSelectImageFormat(format) }) {
+                                Text(text = format.formatName)
+                            }
+                        }
+                    }
                 }
             }
             Spacer(
@@ -187,8 +260,7 @@ fun MainScreen(
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState())
                         .heightIn(min = 128.dp, max = 256.dp)
-                        .padding(8.dp)
-                        .weight(1f),
+                        .padding(8.dp),
                 ) {
                     Text(
                         text = state.extractText.ifBlank { "Extracted text" },
@@ -216,7 +288,7 @@ fun MainScreen(
                 )
                 TextField(
                     value = state.resultFileInfo?.filename ?: "",
-                    onValueChange = {},
+                    onValueChange = setFileName,
                     enabled = state.resultFileInfo != null,
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -252,7 +324,9 @@ fun MainScreenPreview() {
         onPickModifiedImage = {},
         onEmbedData = {},
         onExtractData = {},
+        onSelectImageFormat = {},
         setEmbedText = {},
+        setFileName = {},
         onSaveModifiedImage = {},
     )
 }
