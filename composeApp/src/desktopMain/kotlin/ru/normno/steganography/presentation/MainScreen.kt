@@ -63,6 +63,9 @@ fun MainScreen(
     var isSelectImageFormat by remember {
         mutableStateOf(false)
     }
+    var isSelectStegoMethod by remember {
+        mutableStateOf(false)
+    }
 
     Column(
         modifier = Modifier
@@ -148,10 +151,18 @@ fun MainScreen(
                             ImageFormat.JPEG(),
                             ImageFormat.BMP(),
                         ).forEach { format ->
-                            DropdownMenuItem(onClick = { onSelectImageFormat(format) }) {
+                            DropdownMenuItem(onClick = {
+                                onSelectImageFormat(format)
+                                isSelectImageFormat = false
+                            }) {
                                 Text(text = format.formatName)
                             }
                         }
+                    }
+                    DropdownMenu(
+                        expanded = isSelectStegoMethod,
+                        onDismissRequest = { isSelectStegoMethod = false },
+                    ) {
                     }
                 }
             }

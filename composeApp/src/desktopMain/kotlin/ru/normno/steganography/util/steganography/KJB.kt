@@ -1,6 +1,6 @@
-package ru.normno.steganography.util
+package ru.normno.steganography.util.steganography
 
-import androidx.compose.foundation.Image
+import ru.normno.steganography.util.ImageFormat
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -10,7 +10,7 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-class KJBSteganography(private val lambda: Double, private val seed: Int) {
+class KJB(private val lambda: Double, private val seed: Int) {
     private val endMarker = byteArrayOf(0xFE.toByte(), 0x00, 0xFF.toByte(), 0xFA.toByte())
 
     private fun brightness(r: Int, g: Int, b: Int): Double {

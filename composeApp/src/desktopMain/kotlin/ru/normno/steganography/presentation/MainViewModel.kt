@@ -12,12 +12,12 @@ import kotlinx.coroutines.launch
 import ru.normno.steganography.domain.model.FileInfo
 import ru.normno.steganography.domain.repository.FileRepository
 import ru.normno.steganography.util.ImageFormat
-import ru.normno.steganography.util.KJBSteganography
+import ru.normno.steganography.util.steganography.KJB
 
 class MainViewModel(
     private val fileRepository: FileRepository,
 ) : ViewModel() {
-    private val kjbSteganography = KJBSteganography(0.5, 1)
+    private val kjb = KJB(0.5, 1)
 
     val state: StateFlow<MainState>
         field = MutableStateFlow(MainState())
@@ -66,6 +66,7 @@ class MainViewModel(
                             "PNG" -> ImageFormat.PNG()
                             "JPEG" -> ImageFormat.JPEG()
                             "JPG" -> ImageFormat.JPG()
+                            "BMP" -> ImageFormat.BMP()
                             else -> ImageFormat.PNG()
                         }
                     } ?: ImageFormat.PNG(),
@@ -93,10 +94,10 @@ class MainViewModel(
                 )
             }
             state.value.sourceFileInfo?.let { sourceFileInfo ->
-                val cover = kjbSteganography.byteArrayToImage(sourceFileInfo.byteArray)
-                kjbSteganography.embedData(cover = cover, message = state.value.embedText)
+                val cover = kjb.byteArrayToImage(sourceFileInfo.byteArray)
+                kjb.embedData(cover = cover, message = state.value.embedText)
                     ?.also { bufferedImage ->
-                        val image = kjbSteganography.imageToByteArray(
+                        val image = kjb.imageToByteArray(
                             image = bufferedImage,
                             format = state.value.selectedImageFormat
                         )
@@ -128,8 +129,8 @@ class MainViewModel(
                 )
             }
             state.value.resultFileInfo?.let { resultFileInfo ->
-                val stegoImage = kjbSteganography.byteArrayToImage(resultFileInfo.byteArray)
-                kjbSteganography.extractData(stegoImage).also { text ->
+                val stegoImage = kjb.byteArrayToImage(resultFileInfo.byteArray)
+                kjb.extractData(stegoImage).also { text ->
                     state.update {
                         it.copy(
                             extractText = text,
