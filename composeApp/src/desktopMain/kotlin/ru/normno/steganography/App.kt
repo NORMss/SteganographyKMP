@@ -23,6 +23,7 @@ fun App() {
             setEmbedText = viewModel::setEmbedText,
             setFileName = viewModel::setFileName,
             onSelectImageFormat = viewModel::onSelectImageFormat,
+            onSelectStegoMethod = viewModel::onSelectStegoMethod,
         )
     }
 }

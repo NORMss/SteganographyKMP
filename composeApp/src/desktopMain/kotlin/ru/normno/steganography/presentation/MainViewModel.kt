@@ -12,12 +12,20 @@ import kotlinx.coroutines.launch
 import ru.normno.steganography.domain.model.FileInfo
 import ru.normno.steganography.domain.repository.FileRepository
 import ru.normno.steganography.util.ImageFormat
+import ru.normno.steganography.util.ImageManager.byteArrayToImage
+import ru.normno.steganography.util.ImageManager.imageToByteArray
+import ru.normno.steganography.util.StegoMethod
+import ru.normno.steganography.util.steganography.Compute.computeCapacity
+import ru.normno.steganography.util.steganography.Compute.computePSNR
 import ru.normno.steganography.util.steganography.KJB
+import ru.normno.steganography.util.steganography.LSBMatchingRevisited
+import java.awt.image.BufferedImage
 
 class MainViewModel(
     private val fileRepository: FileRepository,
 ) : ViewModel() {
     private val kjb = KJB(0.5, 1)
+    private val lsbmr = LSBMatchingRevisited()
 
     val state: StateFlow<MainState>
         field = MutableStateFlow(MainState())
@@ -35,6 +43,14 @@ class MainViewModel(
         state.update {
             it.copy(
                 selectedImageFormat = format,
+            )
+        }
+    }
+
+    fun onSelectStegoMethod(stegoMethod: StegoMethod) {
+        state.update {
+            it.copy(
+                selectedStegoMethod = stegoMethod,
             )
         }
     }
@@ -86,66 +102,6 @@ class MainViewModel(
         }
     }
 
-    fun onEmbedData() {
-        viewModelScope.launch(Dispatchers.Default) {
-            state.update {
-                it.copy(
-                    isEbbing = true,
-                )
-            }
-            state.value.sourceFileInfo?.let { sourceFileInfo ->
-                val cover = kjb.byteArrayToImage(sourceFileInfo.byteArray)
-                kjb.embedData(cover = cover, message = state.value.embedText)
-                    ?.also { bufferedImage ->
-                        val image = kjb.imageToByteArray(
-                            image = bufferedImage,
-                            format = state.value.selectedImageFormat
-                        )
-                        state.update {
-                            it.copy(
-                                resultFileInfo = FileInfo(
-                                    filename = sourceFileInfo.filename.substringBeforeLast(".")
-                                            + "_modified",
-                                    byteArray = image,
-                                )
-                            )
-                        }
-                    }
-                onSaveModifiedImage()
-            }
-            state.update {
-                it.copy(
-                    isEbbing = false,
-                )
-            }
-        }
-    }
-
-    fun onExtractData() {
-        viewModelScope.launch(Dispatchers.Default) {
-            state.update {
-                it.copy(
-                    isExtracting = true,
-                )
-            }
-            state.value.resultFileInfo?.let { resultFileInfo ->
-                val stegoImage = kjb.byteArrayToImage(resultFileInfo.byteArray)
-                kjb.extractData(stegoImage).also { text ->
-                    state.update {
-                        it.copy(
-                            extractText = text,
-                        )
-                    }
-                }
-            }
-            state.update {
-                it.copy(
-                    isExtracting = false,
-                )
-            }
-        }
-    }
-
     fun onSaveModifiedImage() {
         viewModelScope.launch(Dispatchers.IO) {
             state.value.resultFileInfo?.let { resultFileInfo ->
@@ -155,5 +111,123 @@ class MainViewModel(
                 )
             }
         }
+    }
+
+    fun onEmbedData() {
+        viewModelScope.launch(Dispatchers.Default) {
+            when (state.value.selectedStegoMethod) {
+                StegoMethod.KJB -> {
+                    embedDataKJB()
+                }
+
+                StegoMethod.LSBMR -> {
+                    embedDataLSBMR()
+                }
+            }
+            state.value.sourceFileInfo?.let { sourceFileInfo ->
+                state.value.resultFileInfo?.let { resultFileInfo ->
+                    val cover = byteArrayToImage(sourceFileInfo.byteArray)
+                    val stego = byteArrayToImage(resultFileInfo.byteArray)
+
+                    state.update {
+                        it.copy(
+                            psnrTotaldBm = computePSNR(cover, stego),
+                            capacityTotalKb = computeCapacity(cover) / 8.0,
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun onExtractData() {
+        viewModelScope.launch(Dispatchers.Default) {
+            when (state.value.selectedStegoMethod) {
+                StegoMethod.KJB -> {
+                    extractDataKJB()
+                }
+
+                StegoMethod.LSBMR -> {
+                    extractDataLSBMR()
+                }
+            }
+        }
+
+    }
+
+    private suspend fun embedDataKJB() {
+        embedData(kjb::embedData)
+    }
+
+    private suspend fun embedDataLSBMR() {
+        embedData(lsbmr::embedData)
+    }
+
+    private suspend fun extractDataKJB() {
+        extractData(kjb::extractData)
+    }
+
+    private suspend fun extractDataLSBMR() {
+        extractData(lsbmr::extractData)
+    }
+
+    private suspend fun embedData(
+        embedMethod: (BufferedImage, String) -> BufferedImage?,
+    ) {
+        state.update {
+            it.copy(
+                isEbbing = true,
+            )
+        }
+        state.value.sourceFileInfo?.let { sourceFileInfo ->
+            val cover = byteArrayToImage(sourceFileInfo.byteArray)
+            embedMethod(cover, state.value.embedText)
+                ?.also { bufferedImage ->
+                    val image = imageToByteArray(
+                        image = bufferedImage,
+                        format = state.value.selectedImageFormat
+                    )
+                    state.update {
+                        it.copy(
+                            resultFileInfo = FileInfo(
+                                filename = sourceFileInfo.filename.substringBeforeLast(".")
+                                        + "_modified",
+                                byteArray = image,
+                            )
+                        )
+                    }
+                }
+        }
+        state.update {
+            it.copy(
+                isEbbing = false,
+            )
+        }
+    }
+
+    private suspend fun extractData(
+        extractMethod: (BufferedImage) -> String,
+    ) {
+        state.update {
+            it.copy(
+                isExtracting = true,
+            )
+        }
+        state.value.resultFileInfo?.let { resultFileInfo ->
+            val stegoImage = byteArrayToImage(resultFileInfo.byteArray)
+            extractMethod(stegoImage).also { text ->
+                state.update {
+                    it.copy(
+                        extractText = text,
+                    )
+                }
+            }
+        }
+        state.update {
+            it.copy(
+                isExtracting = false,
+            )
+        }
+
     }
 }

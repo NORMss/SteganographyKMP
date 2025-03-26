@@ -9,6 +9,8 @@ data class MainState(
     val resultFileInfo: FileInfo? = null,
     val selectedImageFormat: ImageFormat = ImageFormat.PNG(),
     val selectedStegoMethod: StegoMethod = StegoMethod.KJB,
+    val psnrTotaldBm: Double? = null,
+    val capacityTotalKb: Double? = null,
     val embedText: String = "",
     val extractText: String = "",
     val isEbbing: Boolean = false,

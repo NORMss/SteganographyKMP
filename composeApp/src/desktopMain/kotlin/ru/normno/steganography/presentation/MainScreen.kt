@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import ru.normno.steganography.domain.model.FileInfo
 import ru.normno.steganography.util.ImageFormat
+import ru.normno.steganography.util.StegoMethod
 
 @Composable
 fun MainScreen(
@@ -56,6 +57,7 @@ fun MainScreen(
     onExtractData: () -> Unit,
     onSaveModifiedImage: () -> Unit,
     onSelectImageFormat: (ImageFormat) -> Unit,
+    onSelectStegoMethod: (StegoMethod) -> Unit,
     setEmbedText: (String) -> Unit,
     setFileName: (String) -> Unit,
 
@@ -159,10 +161,59 @@ fun MainScreen(
                             }
                         }
                     }
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onClick {
+                                isSelectStegoMethod = true
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = state.selectedStegoMethod::class.simpleName ?: "Unknown",
+                            color = if (state.sourceFileInfo != null)
+                                MaterialTheme.colors.onBackground
+                            else
+                                MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .width(4.dp),
+                        )
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .rotate(if (isSelectStegoMethod) 180f else 0f),
+                        )
+                    }
+                    Spacer(
+                        modifier = Modifier
+                            .height(8.dp)
+                    )
                     DropdownMenu(
                         expanded = isSelectStegoMethod,
                         onDismissRequest = { isSelectStegoMethod = false },
                     ) {
+                        listOf(
+                            StegoMethod.KJB,
+                            StegoMethod.LSBMR,
+                        ).forEach { method ->
+                            DropdownMenuItem(onClick = {
+                                onSelectStegoMethod(method)
+                                isSelectStegoMethod = false
+                            }) {
+                                Text(text = method::class.simpleName ?: "Unknown")
+                            }
+                        }
                     }
                 }
             }
@@ -317,6 +368,16 @@ fun MainScreen(
                         text = "Save"
                     )
                 }
+                if (state.psnrTotaldBm != null && state.capacityTotalKb != null) {
+                    Spacer(
+                        modifier = Modifier
+                            .height(8.dp),
+                    )
+                    Text(
+                        text = "Maximum capacity: ${"%.2f".format(state.capacityTotalKb)} Kb\n" +
+                                "PSNR: ${"%.2f".format(state.psnrTotaldBm)} dBm",
+                    )
+                }
             }
         }
     }
@@ -336,6 +397,7 @@ fun MainScreenPreview() {
         onEmbedData = {},
         onExtractData = {},
         onSelectImageFormat = {},
+        onSelectStegoMethod = {},
         setEmbedText = {},
         setFileName = {},
         onSaveModifiedImage = {},
