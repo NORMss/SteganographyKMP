@@ -206,6 +206,7 @@ fun MainScreen(
                         listOf(
                             StegoMethod.KJB,
                             StegoMethod.LSBMR,
+                            StegoMethod.INMI,
                         ).forEach { method ->
                             DropdownMenuItem(onClick = {
                                 onSelectStegoMethod(method)
@@ -375,7 +376,7 @@ fun MainScreen(
                     )
                     Text(
                         text = "Maximum capacity: ${"%.2f".format(state.capacityTotalKb)} Kb\n" +
-                                "PSNR: ${"%.2f".format(state.psnrTotaldBm)} dBm",
+                                "PSNR: ${"%.2f".format(state.psnrTotaldBm["PSNR_Avg"])} dBm\n"
                     )
                 }
             }

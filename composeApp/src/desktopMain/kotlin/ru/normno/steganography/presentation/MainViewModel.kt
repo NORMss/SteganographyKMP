@@ -16,7 +16,8 @@ import ru.normno.steganography.util.ImageManager.byteArrayToImage
 import ru.normno.steganography.util.ImageManager.imageToByteArray
 import ru.normno.steganography.util.StegoMethod
 import ru.normno.steganography.util.steganography.Compute.computeCapacity
-import ru.normno.steganography.util.steganography.Compute.computePSNR
+import ru.normno.steganography.util.steganography.Compute.computeEnhancedPSNR
+import ru.normno.steganography.util.steganography.INMI
 import ru.normno.steganography.util.steganography.KJB
 import ru.normno.steganography.util.steganography.LSBMatchingRevisited
 import java.awt.image.BufferedImage
@@ -26,6 +27,7 @@ class MainViewModel(
 ) : ViewModel() {
     private val kjb = KJB(0.5, 1)
     private val lsbmr = LSBMatchingRevisited()
+    private val inmi = INMI()
 
     val state: StateFlow<MainState>
         field = MutableStateFlow(MainState())
@@ -123,6 +125,10 @@ class MainViewModel(
                 StegoMethod.LSBMR -> {
                     embedDataLSBMR()
                 }
+
+                StegoMethod.INMI -> {
+                    embedDataINMI()
+                }
             }
             state.value.sourceFileInfo?.let { sourceFileInfo ->
                 state.value.resultFileInfo?.let { resultFileInfo ->
@@ -131,7 +137,7 @@ class MainViewModel(
 
                     state.update {
                         it.copy(
-                            psnrTotaldBm = computePSNR(cover, stego),
+                            psnrTotaldBm = computeEnhancedPSNR(cover, stego),
                             capacityTotalKb = computeCapacity(cover) / 8.0,
                         )
                     }
@@ -150,9 +156,12 @@ class MainViewModel(
                 StegoMethod.LSBMR -> {
                     extractDataLSBMR()
                 }
+
+                StegoMethod.INMI -> {
+                    extractDataINMI()
+                }
             }
         }
-
     }
 
     private suspend fun embedDataKJB() {
@@ -163,12 +172,20 @@ class MainViewModel(
         embedData(lsbmr::embedData)
     }
 
+    private suspend fun embedDataINMI() {
+        embedData(inmi::embedData)
+    }
+
     private suspend fun extractDataKJB() {
         extractData(kjb::extractData)
     }
 
     private suspend fun extractDataLSBMR() {
         extractData(lsbmr::extractData)
+    }
+
+    private suspend fun extractDataINMI() {
+        extractData(inmi::extractData)
     }
 
     private suspend fun embedData(

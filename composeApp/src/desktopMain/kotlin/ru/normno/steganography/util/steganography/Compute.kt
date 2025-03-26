@@ -6,23 +6,46 @@ import kotlin.math.pow
 
 object Compute {
     fun computeCapacity(cover: BufferedImage): Int {
-        val totalPixels = cover.width * cover.height
-        val capacityBits = totalPixels
-        return capacityBits
+        return (cover.width * cover.height) / 4 * 3
     }
 
-    fun computePSNR(cover: BufferedImage, stego: BufferedImage): Double {
-        val width = cover.width
-        val height = cover.height
-        var mse = 0.0
+    fun computeEnhancedPSNR(cover: BufferedImage, stego: BufferedImage): Map<String, Double> {
+        require(cover.width == stego.width && cover.height == stego.height)
 
-        for (y in 0 until height) {
-            for (x in 0 until width) {
-                val diff = (cover.getRGB(x, y) and 0xFF) - (stego.getRGB(x, y) and 0xFF)
-                mse += diff.toDouble().pow(2)
+        val results = mutableMapOf<String, Double>()
+        val channelMSE = DoubleArray(3)
+
+        for (y in 0 until cover.height) {
+            for (x in 0 until cover.width) {
+                val cVal = cover.getRGB(x, y).toRGBComponents()
+                val sVal = stego.getRGB(x, y).toRGBComponents()
+
+                for (i in 0..2) {
+                    channelMSE[i] += (cVal[i] - sVal[i]).pow(2)
+                }
             }
         }
-        mse /= (width * height)
-        return if (mse == 0.0) Double.POSITIVE_INFINITY else 10 * log10((255.0.pow(2)) / mse)
+
+        for (i in 0..2) {
+            channelMSE[i] /= (cover.width * cover.height)
+            results["PSNR_${when(i) {
+                0 -> "R"
+                1 -> "G"
+                else -> "B"
+            }}"] = 10 * log10(255.0.pow(2) / channelMSE[i])
+        }
+
+        val avgMSE = channelMSE.average()
+        results["PSNR_Avg"] = 10 * log10(255.0.pow(2) / avgMSE)
+
+        return results
+    }
+
+    private fun Int.toRGBComponents(): FloatArray {
+        return floatArrayOf(
+            (this shr 16 and 0xFF).toFloat(),
+            (this shr 8 and 0xFF).toFloat(),
+            (this and 0xFF).toFloat()
+        )
     }
 }
