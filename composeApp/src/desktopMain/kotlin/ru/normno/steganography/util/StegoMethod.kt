@@ -4,4 +4,5 @@ sealed interface StegoMethod {
     object KJB : StegoMethod
     object LSBMR : StegoMethod
     object INMI: StegoMethod
+    object IMNP: StegoMethod
 }

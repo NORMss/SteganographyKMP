@@ -15,8 +15,10 @@ import ru.normno.steganography.util.ImageFormat
 import ru.normno.steganography.util.ImageManager.byteArrayToImage
 import ru.normno.steganography.util.ImageManager.imageToByteArray
 import ru.normno.steganography.util.StegoMethod
+import ru.normno.steganography.util.steganography.Compute
 import ru.normno.steganography.util.steganography.Compute.computeCapacity
-import ru.normno.steganography.util.steganography.Compute.computeEnhancedPSNR
+import ru.normno.steganography.util.steganography.Compute.computePSNR
+import ru.normno.steganography.util.steganography.IMNP
 import ru.normno.steganography.util.steganography.INMI
 import ru.normno.steganography.util.steganography.KJB
 import ru.normno.steganography.util.steganography.LSBMatchingRevisited
@@ -28,6 +30,7 @@ class MainViewModel(
     private val kjb = KJB(0.5, 1)
     private val lsbmr = LSBMatchingRevisited()
     private val inmi = INMI()
+    private val imnp = IMNP()
 
     val state: StateFlow<MainState>
         field = MutableStateFlow(MainState())
@@ -93,6 +96,26 @@ class MainViewModel(
         }
     }
 
+    fun onRecoverOriginalImageINMI() {
+        viewModelScope.launch(Dispatchers.IO) {
+            state.value.resultFileInfo?.let { resultFileInfo ->
+                byteArrayToImage(resultFileInfo.byteArray).also { image ->
+                    state.update {
+                        it.copy(
+                            resultFileInfo = resultFileInfo.copy(
+                                byteArray = imageToByteArray(
+                                    image = inmi.recoverOriginalImage(image),
+                                    format = state.value.selectedImageFormat,
+                                )
+                            ),
+                        )
+                    }
+                }
+            }
+            compute()
+        }
+    }
+
     fun onPickModifiedImage() {
         viewModelScope.launch(Dispatchers.IO) {
             val fileInfo = fileRepository.getImage()
@@ -129,20 +152,12 @@ class MainViewModel(
                 StegoMethod.INMI -> {
                     embedDataINMI()
                 }
-            }
-            state.value.sourceFileInfo?.let { sourceFileInfo ->
-                state.value.resultFileInfo?.let { resultFileInfo ->
-                    val cover = byteArrayToImage(sourceFileInfo.byteArray)
-                    val stego = byteArrayToImage(resultFileInfo.byteArray)
 
-                    state.update {
-                        it.copy(
-                            psnrTotaldBm = computeEnhancedPSNR(cover, stego),
-                            capacityTotalKb = computeCapacity(cover) / 8.0,
-                        )
-                    }
+                StegoMethod.IMNP -> {
+                    embedDataIMNP()
                 }
             }
+            compute()
         }
     }
 
@@ -160,6 +175,10 @@ class MainViewModel(
                 StegoMethod.INMI -> {
                     extractDataINMI()
                 }
+
+                StegoMethod.IMNP -> {
+                    extractDataIMNP()
+                }
             }
         }
     }
@@ -176,6 +195,10 @@ class MainViewModel(
         embedData(inmi::embedData)
     }
 
+    private suspend fun embedDataIMNP() {
+        embedData(imnp::embedData)
+    }
+
     private suspend fun extractDataKJB() {
         extractData(kjb::extractData)
     }
@@ -186,6 +209,26 @@ class MainViewModel(
 
     private suspend fun extractDataINMI() {
         extractData(inmi::extractData)
+    }
+
+    private suspend fun extractDataIMNP() {
+        extractData(imnp::extractData)
+    }
+
+    private suspend fun compute() {
+        state.value.sourceFileInfo?.let { sourceFileInfo ->
+            state.value.resultFileInfo?.let { resultFileInfo ->
+                val cover = byteArrayToImage(sourceFileInfo.byteArray)
+                val stego = byteArrayToImage(resultFileInfo.byteArray)
+
+                state.update {
+                    it.copy(
+                        psnrTotaldBm = Compute.computePSNR(cover, stego),
+                        capacityTotalKb = computeCapacity(cover) / 8.0,
+                    )
+                }
+            }
+        }
     }
 
     private suspend fun embedData(

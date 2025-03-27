@@ -25,11 +25,13 @@ import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,6 +60,7 @@ fun MainScreen(
     onSaveModifiedImage: () -> Unit,
     onSelectImageFormat: (ImageFormat) -> Unit,
     onSelectStegoMethod: (StegoMethod) -> Unit,
+    onRecoverOriginalImageINMI: () -> Unit,
     setEmbedText: (String) -> Unit,
     setFileName: (String) -> Unit,
 
@@ -207,6 +210,7 @@ fun MainScreen(
                             StegoMethod.KJB,
                             StegoMethod.LSBMR,
                             StegoMethod.INMI,
+                            StegoMethod.IMNP,
                         ).forEach { method ->
                             DropdownMenuItem(onClick = {
                                 onSelectStegoMethod(method)
@@ -302,6 +306,18 @@ fun MainScreen(
                                 clip = true
                             },
                     )
+                    if (state.resultFileInfo != null && state.selectedStegoMethod is StegoMethod.INMI) {
+                        IconButton(
+                            onClick = {
+                                onRecoverOriginalImageINMI()
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = null,
+                            )
+                        }
+                    }
                 }
                 Text(
                     text = state.resultFileInfo?.byteArray?.let { "File size ${it.size / 1024} kb" }
@@ -376,7 +392,7 @@ fun MainScreen(
                     )
                     Text(
                         text = "Maximum capacity: ${"%.2f".format(state.capacityTotalKb)} Kb\n" +
-                                "PSNR: ${"%.2f".format(state.psnrTotaldBm["PSNR_Avg"])} dBm\n"
+                                "PSNR: ${"%.2f".format(state.psnrTotaldBm)} dBm\n"
                     )
                 }
             }
@@ -402,5 +418,6 @@ fun MainScreenPreview() {
         setEmbedText = {},
         setFileName = {},
         onSaveModifiedImage = {},
+        onRecoverOriginalImageINMI = {},
     )
 }

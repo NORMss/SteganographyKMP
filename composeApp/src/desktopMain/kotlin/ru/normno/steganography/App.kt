@@ -24,6 +24,7 @@ fun App() {
             setFileName = viewModel::setFileName,
             onSelectImageFormat = viewModel::onSelectImageFormat,
             onSelectStegoMethod = viewModel::onSelectStegoMethod,
+            onRecoverOriginalImageINMI = viewModel::onRecoverOriginalImageINMI,
         )
     }
 }
