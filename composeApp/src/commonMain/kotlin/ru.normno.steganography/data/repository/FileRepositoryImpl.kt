@@ -4,6 +4,8 @@ import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.FileKitMode
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.openFilePicker
+import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.readBytes
 import io.github.vinceglb.filekit.saveImageToGallery
 import ru.normno.steganography.domain.model.FileInfo
 import ru.normno.steganography.domain.repository.FileRepository
@@ -13,18 +15,13 @@ class FileRepositoryImpl(
     private val fileKit: FileKit,
 ) : FileRepository {
     override suspend fun getImage(): FileInfo? {
-        val file = fileKit.openFilePicker(
+        return fileKit.openFilePicker(
             mode = FileKitMode.Single,
             type = FileKitType.Image,
-        )?.file
-        return file?.let { file ->
+        )?.let { file ->
             FileInfo(
                 filename = file.name,
-                byteArray = file.let {
-                    FileInputStream(file).use {
-                        it.readBytes()
-                    }
-                }
+                byteArray = file.readBytes()
             )
         }
     }

@@ -2,9 +2,9 @@
 
 package ru.normno.steganography.presentation
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.onClick
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -46,6 +45,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import ru.normno.steganography.domain.model.FileInfo
 import ru.normno.steganography.util.ImageFormat
 import ru.normno.steganography.util.StegoMethod
@@ -119,7 +119,7 @@ fun MainScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .onClick {
+                            .clickable {
                                 if (state.sourceFileInfo != null) {
                                     isSelectImageFormat = true
                                 }
@@ -173,7 +173,7 @@ fun MainScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .onClick {
+                            .clickable {
                                 isSelectStegoMethod = true
                             },
                         verticalAlignment = Alignment.CenterVertically,
@@ -242,7 +242,7 @@ fun MainScreen(
                         .aspectRatio(1f)
                         .heightIn(max = 720.dp)
                         .fillMaxSize()
-                        .onClick {
+                        .clickable {
                             onPickSourceImage()
                         },
                 ) {
@@ -287,7 +287,7 @@ fun MainScreen(
                         .aspectRatio(1f)
                         .heightIn(max = 720.dp)
                         .fillMaxSize()
-                        .onClick {
+                        .clickable {
                             onPickModifiedImage()
                         },
                 ) {

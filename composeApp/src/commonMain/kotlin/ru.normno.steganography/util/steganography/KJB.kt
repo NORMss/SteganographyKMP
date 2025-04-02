@@ -1,12 +1,8 @@
 package ru.normno.steganography.util.steganography
 
-import ru.normno.steganography.util.ImageFormat
 import ru.normno.steganography.util.TextManager.bitsToTextWithMarker
 import ru.normno.steganography.util.TextManager.textToBitsWithMarker
 import java.awt.image.BufferedImage
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import javax.imageio.ImageIO
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
