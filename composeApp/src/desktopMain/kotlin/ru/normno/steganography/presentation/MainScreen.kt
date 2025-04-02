@@ -391,8 +391,14 @@ fun MainScreen(
                             .height(8.dp),
                     )
                     Text(
-                        text = "Maximum capacity: ${"%.2f".format(state.capacityTotalKb)} Kb\n" +
-                                "PSNR: ${"%.2f".format(state.psnrTotaldBm)} dBm\n"
+                        text = ("Maximum capacity: ${"%.2f".format(state.capacityTotalKb)} Kb\n" +
+                                "PSNR: ${"%.2f".format(state.psnrTotaldBm)} dBm\n" +
+                                "RS: ${"%.2f".format(state.rsTotal)}\n" +
+                                "ChiSquare: ${"%.2f".format(state.chiSquareTotal)}\n" +
+                                "Aump: ${"%.2f".format(state.aumpTotal)}\n" +
+                                "Compression: ${"%.2f".format(state.compressionTotal)}").also {
+                            println(it)
+                        }
                     )
                 }
             }

@@ -1,8 +1,9 @@
 package ru.normno.steganography.util.steganography
 
 import java.awt.image.BufferedImage
+import kotlin.math.abs
 
-class RSAnalysis {
+object RSAnalysis {
 
     private fun getRSGroups(image: BufferedImage): Pair<List<Int>, List<Int>> {
         val width = image.width
@@ -15,7 +16,7 @@ class RSAnalysis {
                 val pixel = image.getRGB(x, y) and 0xFF
                 val nextPixel = image.getRGB(x + 1, y) and 0xFF
 
-                if (Math.abs(pixel - nextPixel) < 20) {
+                if (abs(pixel - nextPixel) < 20) {
                     rGroup.add(pixel)
                 } else {
                     sGroup.add(pixel)

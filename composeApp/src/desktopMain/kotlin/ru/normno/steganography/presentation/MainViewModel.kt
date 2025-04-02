@@ -17,11 +17,11 @@ import ru.normno.steganography.util.ImageManager.imageToByteArray
 import ru.normno.steganography.util.StegoMethod
 import ru.normno.steganography.util.steganography.Compute
 import ru.normno.steganography.util.steganography.Compute.computeCapacity
-import ru.normno.steganography.util.steganography.Compute.computePSNR
 import ru.normno.steganography.util.steganography.IMNP
 import ru.normno.steganography.util.steganography.INMI
 import ru.normno.steganography.util.steganography.KJB
 import ru.normno.steganography.util.steganography.LSBMatchingRevisited
+import ru.normno.steganography.util.steganography.RSAnalysis
 import java.awt.image.BufferedImage
 
 class MainViewModel(
@@ -215,7 +215,7 @@ class MainViewModel(
         extractData(imnp::extractData)
     }
 
-    private suspend fun compute() {
+    private fun compute() {
         state.value.sourceFileInfo?.let { sourceFileInfo ->
             state.value.resultFileInfo?.let { resultFileInfo ->
                 val cover = byteArrayToImage(sourceFileInfo.byteArray)
@@ -225,6 +225,10 @@ class MainViewModel(
                     it.copy(
                         psnrTotaldBm = Compute.computePSNR(cover, stego),
                         capacityTotalKb = computeCapacity(cover) / 8.0,
+                        rsTotal = RSAnalysis.analyze(stego),
+                        chiSquareTotal = Compute.chiSquareTest(stego, 2),
+                        aumpTotal = Compute.aumpTest(stego, 2),
+                        compressionTotal = Compute.compressionAnalysis(cover, stego),
                     )
                 }
             }
