@@ -158,7 +158,18 @@ class MainViewModel(
                 }
             }
             compute()
+            visualAttack()
         }
+    }
+
+    fun onAnalysis() {
+        viewModelScope.launch(Dispatchers.Default) {
+            compute()
+        }
+    }
+
+    fun onVisualAttack() {
+        visualAttack()
     }
 
     fun onExtractData() {
@@ -226,10 +237,30 @@ class MainViewModel(
                         psnrTotaldBm = Compute.computePSNR(cover, stego),
                         capacityTotalKb = computeCapacity(cover) / 8.0,
                         rsTotal = RSAnalysis.analyze(stego),
-                        chiSquareTotal = Compute.chiSquareTest(stego, 2),
-                        aumpTotal = Compute.aumpTest(stego, 2),
+                        chiSquareTotal = Compute.chiSquareTest(stego, 4),
+                        aumpTotal = Compute.aumpTest(stego, 4, 2),
                         compressionTotal = Compute.compressionAnalysis(cover, stego),
                     )
+                }
+            }
+        }
+    }
+
+    private fun visualAttack() {
+        state.value.sourceFileInfo?.let { sourceFileInfo ->
+            state.value.resultFileInfo?.let { resultFileInfo ->
+                Compute.visualAttack(
+                    coverImage = byteArrayToImage(sourceFileInfo.byteArray),
+                    stegoImage = byteArrayToImage(resultFileInfo.byteArray),
+                ).also { visualAttack ->
+                    state.update {
+                        it.copy(
+                            visualAttackFileInfo = FileInfo(
+                                filename = sourceFileInfo.filename + "_visual_attack",
+                                byteArray = imageToByteArray(visualAttack)
+                            )
+                        )
+                    }
                 }
             }
         }

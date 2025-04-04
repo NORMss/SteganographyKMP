@@ -7,6 +7,7 @@ import ru.normno.steganography.util.StegoMethod
 data class MainState(
     val sourceFileInfo: FileInfo? = null,
     val resultFileInfo: FileInfo? = null,
+    val visualAttackFileInfo: FileInfo? = null,
     val selectedImageFormat: ImageFormat = ImageFormat.PNG(),
     val selectedStegoMethod: StegoMethod = StegoMethod.KJB,
     val psnrTotaldBm: Double? = null,

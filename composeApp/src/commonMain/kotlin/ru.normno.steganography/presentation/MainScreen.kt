@@ -26,6 +26,7 @@ import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
@@ -53,6 +54,7 @@ import ru.normno.steganography.util.StegoMethod
 @Composable
 fun MainScreen(
     state: MainState,
+    onAnalysis: () -> Unit,
     onPickSourceImage: () -> Unit,
     onPickModifiedImage: () -> Unit,
     onEmbedData: () -> Unit,
@@ -63,12 +65,15 @@ fun MainScreen(
     onRecoverOriginalImageINMI: () -> Unit,
     setEmbedText: (String) -> Unit,
     setFileName: (String) -> Unit,
-
-    ) {
+) {
     var isSelectImageFormat by remember {
         mutableStateOf(false)
     }
     var isSelectStegoMethod by remember {
+        mutableStateOf(false)
+    }
+
+    var isCheckedSwitch by remember {
         mutableStateOf(false)
     }
 
@@ -297,7 +302,7 @@ fun MainScreen(
                             .align(Alignment.Center),
                     )
                     AsyncImage(
-                        model = state.resultFileInfo?.byteArray,
+                        model = if (isCheckedSwitch) state.visualAttackFileInfo?.byteArray else state.resultFileInfo?.byteArray,
                         contentDescription = null,
                         contentScale = ContentScale.Fit,
                         modifier = Modifier
@@ -318,6 +323,14 @@ fun MainScreen(
                             )
                         }
                     }
+                    Switch(
+                        checked = isCheckedSwitch,
+                        onCheckedChange = {
+                            isCheckedSwitch = !isCheckedSwitch
+                        },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd),
+                    )
                 }
                 Text(
                     text = state.resultFileInfo?.byteArray?.let { "File size ${it.size / 1024} kb" }
@@ -385,6 +398,18 @@ fun MainScreen(
                         text = "Save"
                     )
                 }
+                Spacer(
+                    modifier = Modifier
+                        .height(8.dp),
+                )
+                Button(
+                    onClick = onAnalysis,
+                    enabled = state.resultFileInfo != null,
+                ) {
+                    Text(
+                        text = "Analysis"
+                    )
+                }
                 if (state.psnrTotaldBm != null && state.capacityTotalKb != null) {
                     Spacer(
                         modifier = Modifier
@@ -415,6 +440,7 @@ fun MainScreenPreview() {
     )
     MainScreen(
         state = state,
+        onAnalysis = {},
         onPickSourceImage = {},
         onPickModifiedImage = {},
         onEmbedData = {},

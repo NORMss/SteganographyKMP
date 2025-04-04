@@ -33,32 +33,32 @@ object Compute {
         val width = image.width
         val height = image.height
         var chiSquare = 0.0
+        var totalBlocks = 0
 
         for (x in 0 until width step blockSize) {
             for (y in 0 until height step blockSize) {
-                val histogram = IntArray(256)
+                val histogram = IntArray(256) // Стандартный 8-битный гистограмный тест
                 var totalPixels = 0
 
                 for (i in 0 until blockSize) {
                     for (j in 0 until blockSize) {
                         if (x + i < width && y + j < height) {
-                            val rgb = image.getRGB(x + i, y + j)
-                            val gray = (rgb shr 16 and 0xFF) * 0.3 +
-                                    (rgb shr 8 and 0xFF) * 0.59 +
-                                    (rgb and 0xFF) * 0.11
-                            histogram[gray.toInt()]++
+                            val pixel = image.getRGB(x + i, y + j) and 0xFF
+                            histogram[pixel]++
                             totalPixels++
                         }
                     }
                 }
 
-                if (totalPixels > 0) { // Защита от деления на ноль
-                    val expected = totalPixels / 256.0
+                if (totalPixels > 0) {
+                    val expected = totalPixels / 256.0 // Ожидаемое распределение
                     chiSquare += histogram.sumOf { if (expected > 0) ((it - expected).pow(2)) / expected else 0.0 }
+                    totalBlocks++
                 }
             }
         }
-        return chiSquare
+
+        return if (totalBlocks > 0) chiSquare / totalBlocks else chiSquare
     }
 
     fun aumpTest(image: BufferedImage, blockSize: Int, degree: Int): Double {
@@ -66,28 +66,35 @@ object Compute {
         val height = image.height
         var beta = 0.0
         val q = degree + 1
+        var totalBlocks = 0
 
         for (x in 0 until width step blockSize) {
             for (y in 0 until height step blockSize) {
-                val pixels = mutableListOf<Int>()
+                val pixels = mutableListOf<Double>()
                 for (i in 0 until blockSize) {
                     for (j in 0 until blockSize) {
                         if (x + i < width && y + j < height) {
-                            pixels.add(image.getRGB(x + i, y + j) and 0xFF)
+                            pixels.add((image.getRGB(x + i, y + j) and 0xFF).toDouble())
                         }
                     }
                 }
 
-                val X = pixels.map { it.toDouble() }.toDoubleArray()
-                val Xpred = polynomialPrediction(X, blockSize, degree)
+                if (pixels.size < q) continue // Пропуск маленьких блоков
+
+                val X = pixels.toDoubleArray()
+                val Xpred = polynomialPrediction(X, degree)
                 val residuals = X.zip(Xpred) { a, b -> a - b }
                 val variance = residuals.sumOf { it * it } / residuals.size
 
-                val Xbar = X.map { it + 1 - 2 * (it % 2) }
-                beta += X.zip(Xbar) { a, b -> (a - b) * residuals[pixels.indexOf(a.toInt())] }.sum()
+                val Xbar = X.map { it + 1 - 2 * (it % 2) } // Флип LSB
+                val weight = sqrt(variance / residuals.size)
+
+                beta += weight * X.zip(Xbar) { a, b -> (a - b) * residuals[pixels.indexOf(a)] }.sum()
+                totalBlocks++
             }
         }
-        return beta
+
+        return if (totalBlocks > 0) beta / totalBlocks else beta
     }
 
     fun aumpTest(image: BufferedImage, blockSize: Int): Double {
@@ -116,12 +123,11 @@ object Compute {
         return beta
     }
 
-    private fun polynomialPrediction(X: DoubleArray, blockSize: Int, degree: Int): DoubleArray {
+    private fun polynomialPrediction(X: DoubleArray, degree: Int): DoubleArray {
         val q = degree + 1
-        val H = Array(blockSize) { i -> DoubleArray(q) { j -> (i + 1.0).pow(j) } }
-        val Y = X.copyOf()
+        val H = Array(X.size) { i -> DoubleArray(q) { j -> (i + 1.0).pow(j) } }
 
-        val p = leastSquares(H, Y)
+        val p = leastSquares(H, X)
         return H.map { row -> row.zip(p).sumOf { it.first * it.second } }.toDoubleArray()
     }
 
@@ -199,5 +205,24 @@ object Compute {
         }
 
         return sqrt(diffSum / (width * height))
+    }
+
+    fun visualAttack(coverImage: BufferedImage, stegoImage: BufferedImage): BufferedImage {
+        val width = coverImage.width
+        val height = coverImage.height
+        val resultImage = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                val coverPixel = coverImage.getRGB(x, y) and 0xFF
+                val stegoPixel = stegoImage.getRGB(x, y) and 0xFF
+
+                val difference = Math.abs(coverPixel - stegoPixel) * 10  // Усиление контраста
+                val color = (difference shl 16) or (difference shl 8) or difference
+
+                resultImage.setRGB(x, y, color)
+            }
+        }
+        return resultImage
     }
 }
