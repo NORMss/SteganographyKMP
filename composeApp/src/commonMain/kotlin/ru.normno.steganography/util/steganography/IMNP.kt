@@ -10,53 +10,42 @@ import kotlin.math.max
 import kotlin.math.min
 
 class IMNP() {
-    // Embed secret message into cover image using IMNP algorithm
     fun embedData(cover: BufferedImage, message: String): BufferedImage {
-        // Convert message to bits with end marker
         val messageBits = textToBitsWithMarker(message)
         var bitIndex = 0
 
-        // Create a copy of the cover image to modify
         val stego = BufferedImage(cover.width, cover.height, BufferedImage.TYPE_INT_RGB)
         val graphics = stego.createGraphics()
         graphics.drawImage(cover, 0, 0, null)
         graphics.dispose()
 
-        // Process the image in 2x2 blocks (since we downscale to 1/4 then upscale)
         for (h in 0 until cover.height / 2) {
             for (l in 0 until cover.width / 2) {
                 val x = 2 * h
                 val y = 2 * l
 
-                // Get the 4 corner pixels (permanent pixels)
                 val c00 = cover.getRGB(x, y) and 0xFF
                 val c02 = if (y + 2 < cover.width) cover.getRGB(x, y + 2) and 0xFF else c00
                 val c20 = if (x + 2 < cover.height) cover.getRGB(x + 2, y) and 0xFF else c00
                 val c22 = if (x + 2 < cover.height && y + 2 < cover.width) cover.getRGB(x + 2, y + 2) and 0xFF else c00
 
-                // Calculate Omin and Omax
                 val Omin = min(min(c00, c02), min(c20, c22))
                 val Omax = max(max(c00, c02), max(c20, c22))
 
-                // Calculate the interpolated pixels
                 val c01 = (Omax + (c00 + c02) / 2) / 2
                 val c10 = (Omax + (c00 + c20) / 2) / 2
                 val c11 = (c10 + c01) / 2
 
-                // Calculate difference values
                 val v1 = c01 - Omin
                 val v2 = c10 - Omin
                 val v3 = c11 - Omin
 
-                // Calculate number of bits we can embed in each pixel
                 val a1 = floor(log2(v1.toDouble())).toInt()
                 val a2 = floor(log2(v2.toDouble())).toInt()
                 val a3 = floor(log2(v3.toDouble())).toInt()
 
-                // Keep original permanent pixels
                 stego.setRGB(x, y, cover.getRGB(x, y))
 
-                // Embed in c01 (x, y+1)
                 if (bitIndex < messageBits.size && a1 > 0) {
                     val bitsToEmbed = min(a1, messageBits.size - bitIndex)
                     val secretBits = messageBits.subList(bitIndex, bitIndex + bitsToEmbed)
@@ -69,7 +58,6 @@ class IMNP() {
                     stego.setRGB(x, y + 1, cover.getRGB(x, y + 1))
                 }
 
-                // Embed in c10 (x+1, y)
                 if (bitIndex < messageBits.size && a2 > 0) {
                     val bitsToEmbed = min(a2, messageBits.size - bitIndex)
                     val secretBits = messageBits.subList(bitIndex, bitIndex + bitsToEmbed)
@@ -82,7 +70,6 @@ class IMNP() {
                     stego.setRGB(x + 1, y, cover.getRGB(x + 1, y))
                 }
 
-                // Embed in c11 (x+1, y+1)
                 if (bitIndex < messageBits.size && a3 > 0) {
                     val bitsToEmbed = min(a3, messageBits.size - bitIndex)
                     val secretBits = messageBits.subList(bitIndex, bitIndex + bitsToEmbed)
@@ -100,42 +87,34 @@ class IMNP() {
         return stego
     }
 
-    // Extract secret message from stego image using IMNP algorithm
     fun extractData(stego: BufferedImage): String {
         val extractedBits = mutableListOf<Int>()
 
-        // Process the image in 2x2 blocks
         for (h in 0 until stego.height / 2) {
             for (l in 0 until stego.width / 2) {
                 val x = 2 * h
                 val y = 2 * l
 
-                // Get the permanent pixels
                 val c00 = stego.getRGB(x, y) and 0xFF
                 val c02 = if (y + 2 < stego.width) stego.getRGB(x, y + 2) and 0xFF else c00
                 val c20 = if (x + 2 < stego.height) stego.getRGB(x + 2, y) and 0xFF else c00
                 val c22 = if (x + 2 < stego.height && y + 2 < stego.width) stego.getRGB(x + 2, y + 2) and 0xFF else c00
 
-                // Calculate Omin and Omax
                 val Omin = min(min(c00, c02), min(c20, c22))
                 val Omax = max(max(c00, c02), max(c20, c22))
 
-                // Get the stego pixels
                 val s01 = stego.getRGB(x, y + 1) and 0xFF
                 val s10 = stego.getRGB(x + 1, y) and 0xFF
                 val s11 = stego.getRGB(x + 1, y + 1) and 0xFF
 
-                // Calculate difference values
                 val v1 = if (s01 <= Omax) Omax - s01 else 0
                 val v2 = if (s10 <= Omax) Omax - s10 else 0
                 val v3 = if (s11 >= Omin) s11 - Omin else 0
 
-                // Calculate number of bits embedded in each pixel
                 val a1 = if (v1 > 0) floor(log2(v1.toDouble())).toInt() else 0
                 val a2 = if (v2 > 0) floor(log2(v2.toDouble())).toInt() else 0
                 val a3 = if (v3 > 0) floor(log2(v3.toDouble())).toInt() else 0
 
-                // Extract from s01 (x, y+1)
                 if (a1 > 0) {
                     val R1 = Omax - s01
                     for (i in a1 - 1 downTo 0) {
@@ -143,7 +122,6 @@ class IMNP() {
                     }
                 }
 
-                // Extract from s10 (x+1, y)
                 if (a2 > 0) {
                     val R2 = Omax - s10
                     for (i in a2 - 1 downTo 0) {
@@ -151,7 +129,6 @@ class IMNP() {
                     }
                 }
 
-                // Extract from s11 (x+1, y+1)
                 if (a3 > 0) {
                     val R3 = s11 - Omin
                     for (i in a3 - 1 downTo 0) {
@@ -161,7 +138,6 @@ class IMNP() {
             }
         }
 
-        // Convert bits back to text
         return bitsToTextWithMarker(extractedBits)
     }
 }

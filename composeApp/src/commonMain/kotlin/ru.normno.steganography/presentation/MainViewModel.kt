@@ -236,7 +236,7 @@ class MainViewModel(
                     it.copy(
                         psnrTotaldBm = Compute.computePSNR(cover, stego),
                         capacityTotalKb = computeCapacity(cover) / 8.0,
-                        rsTotal = RSAnalysis.analyze(stego),
+                        rsTotal = RSAnalysis.doAnalysis(stego).first(),
                         chiSquareTotal = Compute.chiSquareTest(stego, 4),
                         aumpTotal = Compute.aumpTest(stego, 4, 2),
                         compressionTotal = Compute.compressionAnalysis(cover, stego),
