@@ -11,7 +11,7 @@ data class MainState(
     val selectedImageFormat: ImageFormat = ImageFormat.PNG(),
     val selectedStegoMethod: StegoMethod = StegoMethod.KJB,
     val psnrTotaldBm: Double? = null,
-    val rsTotal: Double? = null,
+    val rsTotal: List<Double> = emptyList(),
     val chiSquareTotal: Double? = null,
     val aumpTotal: Double? = null,
     val compressionTotal: Double? = null,

@@ -138,6 +138,16 @@ class MainViewModel(
         }
     }
 
+    fun onSaveExtractedText() {
+        viewModelScope.launch(Dispatchers.IO) {
+            fileRepository.saveTextToFile(
+                filename = state.value.resultFileInfo?.filename
+                    ?: state.value.extractText.substringBeforeLast(" ").substring(0..10),
+                text = state.value.extractText,
+            )
+        }
+    }
+
     fun onEmbedData() {
         viewModelScope.launch(Dispatchers.Default) {
             when (state.value.selectedStegoMethod) {
@@ -166,10 +176,6 @@ class MainViewModel(
         viewModelScope.launch(Dispatchers.Default) {
             compute()
         }
-    }
-
-    fun onVisualAttack() {
-        visualAttack()
     }
 
     fun onExtractData() {
@@ -236,7 +242,7 @@ class MainViewModel(
                     it.copy(
                         psnrTotaldBm = Compute.computePSNR(cover, stego),
                         capacityTotalKb = computeCapacity(cover) / 8.0,
-                        rsTotal = RSAnalysis.doAnalysis(stego).first(),
+                        rsTotal = RSAnalysis.doAnalysis(stego).toList(),
                         chiSquareTotal = Compute.chiSquareTest(stego, 4),
                         aumpTotal = Compute.aumpTest(stego, 4, 2),
                         compressionTotal = Compute.compressionAnalysis(cover, stego),

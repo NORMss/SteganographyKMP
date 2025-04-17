@@ -32,6 +32,7 @@ import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,6 +64,7 @@ fun MainScreen(
     onSelectImageFormat: (ImageFormat) -> Unit,
     onSelectStegoMethod: (StegoMethod) -> Unit,
     onRecoverOriginalImageINMI: () -> Unit,
+    onSaveExtractedText: () -> Unit,
     setEmbedText: (String) -> Unit,
     setFileName: (String) -> Unit,
 ) {
@@ -350,8 +352,8 @@ fun MainScreen(
                     modifier = Modifier
                         .border(1.dp, MaterialTheme.colors.primary, RoundedCornerShape(8))
                         .fillMaxWidth()
-                        .verticalScroll(rememberScrollState())
                         .heightIn(min = 128.dp, max = 256.dp)
+                        .verticalScroll(rememberScrollState())
                         .padding(8.dp),
                 ) {
                     Text(
@@ -366,13 +368,29 @@ fun MainScreen(
                     modifier = Modifier
                         .height(8.dp),
                 )
-                Button(
-                    onClick = onExtractData,
-                    enabled = state.resultFileInfo != null && !state.isExtracting
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(
-                        text = "Extract text"
-                    )
+                    Button(
+                        modifier = Modifier
+                            .weight(1f),
+                        onClick = onExtractData,
+                        enabled = state.resultFileInfo != null && !state.isExtracting,
+                    ) {
+                        Text(
+                            text = "Extract text"
+                        )
+                    }
+                    IconButton(
+                        onClick = onSaveExtractedText,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Save,
+                            contentDescription = null,
+                        )
+                    }
                 }
                 Spacer(
                     modifier = Modifier
@@ -418,7 +436,11 @@ fun MainScreen(
                     Text(
                         text = ("Maximum capacity: ${"%.2f".format(state.capacityTotalKb)} Kb\n" +
                                 "PSNR: ${"%.2f".format(state.psnrTotaldBm)} dBm\n" +
-                                "RS: ${"%.2f".format(state.rsTotal)}\n" +
+                                "RS: ${
+                                    state.rsTotal.joinToString(
+                                        ", ",
+                                        transform = { "%.2f".format(it) })
+                                } " +
                                 "ChiSquare: ${"%.2f".format(state.chiSquareTotal)}\n" +
                                 "Aump: ${"%.2f".format(state.aumpTotal)}\n" +
                                 "Compression: ${"%.2f".format(state.compressionTotal)}").also {
@@ -451,5 +473,6 @@ fun MainScreenPreview() {
         setFileName = {},
         onSaveModifiedImage = {},
         onRecoverOriginalImageINMI = {},
+        onSaveExtractedText = {},
     )
 }

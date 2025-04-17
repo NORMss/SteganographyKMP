@@ -27,6 +27,8 @@ kotlin {
         val desktopMain by getting
         
         commonMain.dependencies {
+            implementation(libs.material.icons.extended)
+
             implementation(libs.kotlin.reflect)
 
             implementation(libs.bundles.koin)

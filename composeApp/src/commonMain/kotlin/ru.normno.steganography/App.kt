@@ -26,6 +26,7 @@ fun App() {
             setEmbedText = viewModel::setEmbedText,
             setFileName = viewModel::setFileName,
             onSelectImageFormat = viewModel::onSelectImageFormat,
+            onSaveExtractedText = viewModel::onSaveExtractedText,
             onSelectStegoMethod = viewModel::onSelectStegoMethod,
             onRecoverOriginalImageINMI = viewModel::onRecoverOriginalImageINMI,
         )
