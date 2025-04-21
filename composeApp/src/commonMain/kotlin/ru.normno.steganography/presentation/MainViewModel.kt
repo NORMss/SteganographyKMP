@@ -131,8 +131,10 @@ class MainViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             state.value.resultFileInfo?.let { resultFileInfo ->
                 fileRepository.saveImage(
-                    filename = resultFileInfo.filename + ".${state.value.selectedImageFormat.formatName.lowercase()}",
-                    byteArray = resultFileInfo.byteArray,
+                    FileInfo(
+                        filename = resultFileInfo.filename + ".${state.value.selectedImageFormat.formatName.lowercase()}",
+                        byteArray = resultFileInfo.byteArray,
+                    )
                 )
             }
         }

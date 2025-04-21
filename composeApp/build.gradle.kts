@@ -27,6 +27,12 @@ kotlin {
         val desktopMain by getting
         
         commonMain.dependencies {
+            implementation(compose.material3AdaptiveNavigationSuite)
+
+            implementation(libs.material3.adaptive)
+            implementation(libs.material3.adaptive.layout)
+            implementation(libs.material3.adaptive.navigation)
+
             implementation(libs.material.icons.extended)
 
             implementation(libs.kotlin.reflect)
@@ -42,7 +48,7 @@ kotlin {
 
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material)
+            implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)

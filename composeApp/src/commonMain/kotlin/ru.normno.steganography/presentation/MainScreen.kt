@@ -67,6 +67,7 @@ fun MainScreen(
     onSaveExtractedText: () -> Unit,
     setEmbedText: (String) -> Unit,
     setFileName: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var isSelectImageFormat by remember {
         mutableStateOf(false)
@@ -80,9 +81,12 @@ fun MainScreen(
     }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(
+                horizontal = 16.dp,
+                vertical = 8.dp,
+            ),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

@@ -22,13 +22,31 @@ class FileRepositoryImpl(
         )?.let { file ->
             FileInfo(
                 filename = file.name,
-                byteArray = file.readBytes()
+                byteArray = file.readBytes(),
             )
         }
     }
 
-    override suspend fun saveImage(filename: String, byteArray: ByteArray) {
-        fileKit.saveImageToGallery(byteArray, filename)
+    override suspend fun getImages(): List<FileInfo> {
+        return fileKit.openFilePicker(
+            mode = FileKitMode.Multiple(),
+            type = FileKitType.Image,
+        )?.map {
+            FileInfo(
+                filename = it.name,
+                byteArray = it.readBytes(),
+            )
+        } ?: emptyList()
+    }
+
+    override suspend fun saveImage(fileInfo: FileInfo) {
+        fileKit.saveImageToGallery(fileInfo.byteArray, fileInfo.filename)
+    }
+
+    override suspend fun saveImages(images: List<FileInfo>) {
+        images.map { image ->
+            fileKit.saveImageToGallery(image.byteArray, image.filename)
+        }
     }
 
     override suspend fun saveTextToFile(filename: String, text: String) {
