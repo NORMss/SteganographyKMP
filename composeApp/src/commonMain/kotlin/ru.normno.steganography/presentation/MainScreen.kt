@@ -20,19 +20,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Switch
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -140,9 +140,9 @@ fun MainScreen(
                         Text(
                             text = state.selectedImageFormat.formatName,
                             color = if (state.sourceFileInfo != null)
-                                MaterialTheme.colors.onBackground
+                                MaterialTheme.colorScheme.onBackground
                             else
-                                MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                                MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -167,12 +167,15 @@ fun MainScreen(
                             ImageFormat.JPEG(),
                             ImageFormat.BMP(),
                         ).forEach { format ->
-                            DropdownMenuItem(onClick = {
-                                onSelectImageFormat(format)
-                                isSelectImageFormat = false
-                            }) {
-                                Text(text = format.formatName)
-                            }
+                            DropdownMenuItem(
+                                onClick = {
+                                    onSelectImageFormat(format)
+                                    isSelectImageFormat = false
+                                },
+                                text = {
+                                    Text(text = format.formatName)
+                                },
+                            )
                         }
                     }
                 }
@@ -192,9 +195,9 @@ fun MainScreen(
                         Text(
                             text = state.selectedStegoMethod::class.simpleName ?: "Unknown",
                             color = if (state.sourceFileInfo != null)
-                                MaterialTheme.colors.onBackground
+                                MaterialTheme.colorScheme.onBackground
                             else
-                                MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                                MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -223,12 +226,15 @@ fun MainScreen(
                             StegoMethod.INMI,
                             StegoMethod.IMNP,
                         ).forEach { method ->
-                            DropdownMenuItem(onClick = {
-                                onSelectStegoMethod(method)
-                                isSelectStegoMethod = false
-                            }) {
-                                Text(text = method::class.simpleName ?: "Unknown")
-                            }
+                            DropdownMenuItem(
+                                onClick = {
+                                    onSelectStegoMethod(method)
+                                    isSelectStegoMethod = false
+                                },
+                                text = {
+                                    Text(text = method::class.simpleName ?: "Unknown")
+                                }
+                            )
                         }
                     }
                 }
@@ -354,7 +360,7 @@ fun MainScreen(
             ) {
                 Column(
                     modifier = Modifier
-                        .border(1.dp, MaterialTheme.colors.primary, RoundedCornerShape(8))
+                        .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8))
                         .fillMaxWidth()
                         .heightIn(min = 128.dp, max = 256.dp)
                         .verticalScroll(rememberScrollState())
@@ -363,9 +369,9 @@ fun MainScreen(
                     Text(
                         text = state.extractText.ifBlank { "Extracted text" },
                         color = if (state.extractText.isBlank())
-                            MaterialTheme.colors.primary.copy(alpha = 0.5f)
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                         else
-                            MaterialTheme.colors.primary,
+                            MaterialTheme.colorScheme.primary,
                     )
                 }
                 Spacer(
