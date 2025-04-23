@@ -22,11 +22,16 @@ kotlin {
     }
 
     jvm("desktop")
-    
+
     sourceSets {
         val desktopMain by getting
-        
+
         commonMain.dependencies {
+
+            implementation(libs.kotlinx.serialization)
+            implementation(libs.navigation.compose)
+            implementation(libs.navigation.common)
+
             implementation(compose.material3AdaptiveNavigationSuite)
 
             implementation(libs.material3.adaptive)

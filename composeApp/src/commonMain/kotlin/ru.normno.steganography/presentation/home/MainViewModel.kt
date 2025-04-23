@@ -1,4 +1,4 @@
-package ru.normno.steganography.presentation
+package ru.normno.steganography.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

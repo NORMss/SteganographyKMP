@@ -1,4 +1,4 @@
-package ru.normno.steganography.presentation
+package ru.normno.steganography.presentation.home
 
 import ru.normno.steganography.domain.model.FileInfo
 import ru.normno.steganography.util.ImageFormat
