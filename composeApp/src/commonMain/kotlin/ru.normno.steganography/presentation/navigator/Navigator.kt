@@ -18,12 +18,15 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.adaptive.navigationsuite.rememberNavigationSuiteScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -52,6 +55,16 @@ fun Navigator() {
             }
             val windowWithClass =
                 currentWindowAdaptiveInfo().windowSizeClass.windowWidthSizeClass
+
+            LaunchedEffect(
+                selectedItemIndex
+            ) {
+                when (selectedItemIndex) {
+                    0 -> navigateToTab(navController, Route.Home)
+                    1 -> navigateToTab(navController, Route.Multi)
+                    2 -> navigateToTab(navController, Route.About)
+                }
+            }
             Scaffold(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -120,6 +133,22 @@ fun Navigator() {
         }
     }
 }
+
+private fun navigateToTab(
+    navController: NavController,
+    route: Route,
+) {
+    navController.navigate(route) {
+        navController.graph.startDestinationRoute?.let { homeScreen ->
+            popUpTo(homeScreen) {
+                saveState = true
+            }
+            restoreState = true
+            launchSingleTop = true
+        }
+    }
+}
+
 
 enum class Screen(
     val title: String,
