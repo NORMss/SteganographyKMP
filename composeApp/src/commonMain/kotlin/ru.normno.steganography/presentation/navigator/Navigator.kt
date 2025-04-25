@@ -16,9 +16,7 @@ import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
-import androidx.compose.material3.adaptive.navigationsuite.rememberNavigationSuiteScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +35,7 @@ import ru.normno.steganography.presentation.about.MultiScreen
 import ru.normno.steganography.presentation.home.MainScreen
 import ru.normno.steganography.presentation.home.MainViewModel
 import ru.normno.steganography.presentation.multi.AboutScreen
+import ru.normno.steganography.presentation.multi.MultiViewModel
 
 @Composable
 fun Navigator() {
@@ -44,67 +43,60 @@ fun Navigator() {
     val viewModel = koinViewModel<MainViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    NavHost(
-        navController = navController,
-        startDestination = Route.Home,
-    ) {
-        composable<Route.Home> {
-            val navigationSuiteState = rememberNavigationSuiteScaffoldState()
-            var selectedItemIndex by remember {
-                mutableIntStateOf(0)
-            }
-            val windowWithClass =
-                currentWindowAdaptiveInfo().windowSizeClass.windowWidthSizeClass
-
-            LaunchedEffect(
-                selectedItemIndex
-            ) {
-                when (selectedItemIndex) {
-                    0 -> navigateToTab(navController, Route.Home)
-                    1 -> navigateToTab(navController, Route.Multi)
-                    2 -> navigateToTab(navController, Route.About)
-                }
-            }
-            Scaffold(
-                modifier = Modifier
-                    .fillMaxSize(),
-            ) { paddingValues ->
-                NavigationSuiteScaffold(
-                    navigationSuiteItems = {
-                        Screen.entries.forEachIndexed { index, screen ->
-                            item(
-                                selected = index == selectedItemIndex,
-                                onClick = {
-                                    selectedItemIndex = index
-                                },
-                                icon = {
-                                    Icon(
-                                        imageVector = if (selectedItemIndex == index)
-                                            screen.selectedIcon
-                                        else
-                                            screen.unselectedIcon,
-                                        contentDescription = null,
-                                    )
-                                },
-                                label = {
-                                    Text(
-                                        text = screen.title,
-                                    )
-                                },
+    var selectedItemIndex by remember {
+        mutableIntStateOf(0)
+    }
+    val windowWithClass =
+        currentWindowAdaptiveInfo().windowSizeClass.windowWidthSizeClass
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize(),
+    ) { paddingValues ->
+        NavigationSuiteScaffold(
+            navigationSuiteItems = {
+                Screen.entries.forEachIndexed { index, screen ->
+                    item(
+                        selected = index == selectedItemIndex,
+                        onClick = {
+                            selectedItemIndex = index
+                            when (index) {
+                                0 -> navigateToTab(navController, Route.Home)
+                                1 -> navigateToTab(navController, Route.Multi)
+                                2 -> navigateToTab(navController, Route.About)
+                            }
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = if (selectedItemIndex == index)
+                                    screen.selectedIcon
+                                else
+                                    screen.unselectedIcon,
+                                contentDescription = null,
                             )
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    state = navigationSuiteState,
-                    layoutType = if (windowWithClass == WindowWidthSizeClass.EXPANDED) {
-                        NavigationSuiteType.NavigationDrawer
-                    } else {
-                        NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(
-                            currentWindowAdaptiveInfo()
-                        )
-                    }
-                ) {
+                        },
+                        label = {
+                            Text(
+                                text = screen.title,
+                            )
+                        },
+                    )
+                }
+            },
+            modifier = Modifier
+                .fillMaxSize(),
+            layoutType = if (windowWithClass == WindowWidthSizeClass.EXPANDED) {
+                NavigationSuiteType.NavigationDrawer
+            } else {
+                NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(
+                    currentWindowAdaptiveInfo()
+                )
+            }
+        ) {
+            NavHost(
+                navController = navController,
+                startDestination = Route.Home,
+            ) {
+                composable<Route.Home> {
                     MainScreen(
                         state = state,
                         onAnalysis = viewModel::onAnalysis,
@@ -123,13 +115,19 @@ fun Navigator() {
                             .padding(paddingValues),
                     )
                 }
+                composable<Route.Multi> {
+                    val viewModel = koinViewModel<MultiViewModel>()
+                    val state by viewModel.state.collectAsStateWithLifecycle()
+                    MultiScreen(
+                        state = state,
+                        onPickImages = viewModel::onPickSourceImages,
+                        modifier = Modifier
+                    )
+                }
+                composable<Route.About> {
+                    AboutScreen()
+                }
             }
-        }
-        composable<Route.Multi> {
-            MultiScreen()
-        }
-        composable<Route.About> {
-            AboutScreen()
         }
     }
 }

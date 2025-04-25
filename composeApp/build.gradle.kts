@@ -28,7 +28,6 @@ kotlin {
         val desktopMain by getting
 
         commonMain.dependencies {
-
             implementation(libs.kotlinx.serialization)
             implementation(libs.navigation.compose)
             implementation(libs.navigation.common)
