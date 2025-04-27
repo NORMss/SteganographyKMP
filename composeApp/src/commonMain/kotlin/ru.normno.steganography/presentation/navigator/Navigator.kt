@@ -31,17 +31,15 @@ import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowWidthSizeClass
 import org.koin.compose.viewmodel.koinViewModel
 import ru.normno.steganography.nvgraph.Route
-import ru.normno.steganography.presentation.about.MultiScreen
+import ru.normno.steganography.presentation.about.AboutScreen
 import ru.normno.steganography.presentation.home.MainScreen
 import ru.normno.steganography.presentation.home.MainViewModel
-import ru.normno.steganography.presentation.multi.AboutScreen
+import ru.normno.steganography.presentation.multi.MultiScreen
 import ru.normno.steganography.presentation.multi.MultiViewModel
 
 @Composable
 fun Navigator() {
     val navController = rememberNavController()
-    val viewModel = koinViewModel<MainViewModel>()
-    val state by viewModel.state.collectAsStateWithLifecycle()
 
     var selectedItemIndex by remember {
         mutableIntStateOf(0)
@@ -97,6 +95,8 @@ fun Navigator() {
                 startDestination = Route.Home,
             ) {
                 composable<Route.Home> {
+                    val viewModel = koinViewModel<MainViewModel>()
+                    val state by viewModel.state.collectAsStateWithLifecycle()
                     MainScreen(
                         state = state,
                         onAnalysis = viewModel::onAnalysis,

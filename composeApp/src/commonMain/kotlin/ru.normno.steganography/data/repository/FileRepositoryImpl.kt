@@ -31,10 +31,10 @@ class FileRepositoryImpl(
         return fileKit.openFilePicker(
             mode = FileKitMode.Multiple(),
             type = FileKitType.Image,
-        )?.map {
+        )?.map { file ->
             FileInfo(
-                filename = it.name,
-                byteArray = it.readBytes(),
+                filename = file.name,
+                byteArray = file.readBytes(),
             )
         } ?: emptyList()
     }
