@@ -121,6 +121,8 @@ fun Navigator() {
                     MultiScreen(
                         state = state,
                         onPickImages = viewModel::onPickSourceImages,
+                        onSelectStegoMethod = viewModel::onSelectStegoMethod,
+                        onSelectImageFormat = viewModel::onSelectImageFormat,
                         modifier = Modifier
                     )
                 }

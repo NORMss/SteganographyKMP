@@ -55,196 +55,193 @@ fun MultiScreen(
         mutableStateOf(false)
     }
 
-    Column(
-        modifier = modifier
+    Row(
+        modifier = Modifier
             .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(
+        Column(
             modifier = Modifier
-                .fillMaxSize(),
+                .weight(1f),
         ) {
-            Column {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp),
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                isSelectStegoMethod = true
-                            },
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = state.selectedStegoMethod::class.simpleName ?: "Unknown",
-                            color = if (state.sourceFilesInfo.isEmpty())
-                                MaterialTheme.colorScheme.onBackground
-                            else
-                                MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Spacer(
-                            modifier = Modifier
-                                .width(4.dp),
-                        )
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .rotate(if (isSelectStegoMethod) 180f else 0f),
-                        )
-                    }
-                    Spacer(
-                        modifier = Modifier
-                            .height(8.dp)
-                    )
-                    DropdownMenu(
-                        expanded = isSelectStegoMethod,
-                        onDismissRequest = { isSelectStegoMethod = false },
-                    ) {
-                        listOf(
-                            StegoMethod.KJB,
-                            StegoMethod.LSBMR,
-                            StegoMethod.INMI,
-                            StegoMethod.IMNP,
-                        ).forEach { method ->
-                            DropdownMenuItem(
-                                onClick = {
-                                    onSelectStegoMethod(method)
-                                    isSelectStegoMethod = false
-                                },
-                                text = {
-                                    Text(text = method::class.simpleName ?: "Unknown")
-                                }
-                            )
-                        }
-                    }
-                }
-                Spacer(
-                    modifier = Modifier
-                        .height(8.dp),
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp),
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                if (state.sourceFilesInfo.isEmpty()) {
-                                    isSelectImageFormat = true
-                                }
-                            },
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = state.selectedImageFormat.formatName,
-                            color = if (state.sourceFilesInfo.isEmpty())
-                                MaterialTheme.colorScheme.onBackground
-                            else
-                                MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Spacer(
-                            modifier = Modifier
-                                .width(4.dp),
-                        )
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .rotate(if (isSelectImageFormat) 180f else 0f),
-                        )
-                    }
-                    DropdownMenu(
-                        expanded = isSelectImageFormat,
-                        onDismissRequest = { isSelectImageFormat = false },
-                    ) {
-                        listOf(
-                            ImageFormat.PNG(),
-                            ImageFormat.JPG(),
-                            ImageFormat.JPEG(),
-                            ImageFormat.BMP(),
-                        ).forEach { format ->
-                            DropdownMenuItem(
-                                onClick = {
-                                    onSelectImageFormat(format)
-                                    isSelectImageFormat = false
-                                },
-                                text = {
-                                    Text(text = format.formatName)
-                                },
-                            )
-                        }
-                    }
-                }
-            }
-            Column(
+            Box(
                 modifier = Modifier
-                    .weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
             ) {
-                Button(
-                    onClick = onPickImages,
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            isSelectStegoMethod = true
+                        },
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ImageSearch,
-                        contentDescription = null,
+                    Text(
+                        text = state.selectedStegoMethod::class.simpleName ?: "Unknown",
+                        color = if (state.sourceFilesInfo.isEmpty())
+                            MaterialTheme.colorScheme.onBackground
+                        else
+                            MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                     Spacer(
                         modifier = Modifier
                             .width(4.dp),
                     )
-                    Text(
-                        text = "Pick Images"
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .rotate(if (isSelectStegoMethod) 180f else 0f),
                     )
                 }
-                LazyColumn(
+                Spacer(
+                    modifier = Modifier
+                        .height(8.dp)
+                )
+                DropdownMenu(
+                    expanded = isSelectStegoMethod,
+                    onDismissRequest = { isSelectStegoMethod = false },
+                ) {
+                    listOf(
+                        StegoMethod.KJB,
+                        StegoMethod.LSBMR,
+                        StegoMethod.INMI,
+                        StegoMethod.IMNP,
+                    ).forEach { method ->
+                        DropdownMenuItem(
+                            onClick = {
+                                onSelectStegoMethod(method)
+                                isSelectStegoMethod = false
+                            },
+                            text = {
+                                Text(text = method::class.simpleName ?: "Unknown")
+                            }
+                        )
+                    }
+                }
+            }
+            Spacer(
+                modifier = Modifier
+                    .height(8.dp),
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+            ) {
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    contentPadding = PaddingValues(8.dp),
+                        .clickable {
+                            if (state.sourceFilesInfo.isEmpty()) {
+                                isSelectImageFormat = true
+                            }
+                        },
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    items(
-                        count = state.sourceFilesInfo.size,
-                        key = {
-                            state.sourceFilesInfo[it].filename
-                        }
+                    Text(
+                        text = state.selectedImageFormat.formatName,
+                        color = if (state.sourceFilesInfo.isEmpty())
+                            MaterialTheme.colorScheme.onBackground
+                        else
+                            MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Spacer(
+                        modifier = Modifier
+                            .width(4.dp),
+                    )
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .rotate(if (isSelectImageFormat) 180f else 0f),
+                    )
+                }
+                DropdownMenu(
+                    expanded = isSelectImageFormat,
+                    onDismissRequest = { isSelectImageFormat = false },
+                ) {
+                    listOf(
+                        ImageFormat.PNG(),
+                        ImageFormat.JPG(),
+                        ImageFormat.JPEG(),
+                        ImageFormat.BMP(),
+                    ).forEach { format ->
+                        DropdownMenuItem(
+                            onClick = {
+                                onSelectImageFormat(format)
+                                isSelectImageFormat = false
+                            },
+                            text = {
+                                Text(text = format.formatName)
+                            },
+                        )
+                    }
+                }
+            }
+        }
+        Column(
+            modifier = Modifier
+                .weight(3f),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Button(
+                onClick = onPickImages,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ImageSearch,
+                    contentDescription = null,
+                )
+                Spacer(
+                    modifier = Modifier
+                        .width(4.dp),
+                )
+                Text(
+                    text = "Pick Images"
+                )
+            }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                contentPadding = PaddingValues(8.dp),
+            ) {
+                items(
+                    count = state.sourceFilesInfo.size,
+                    key = {
+                        state.sourceFilesInfo[it].filename
+                    }
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                            .height(64.dp)
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Row(
+                        AsyncImage(
+                            model = state.sourceFilesInfo[it].byteArray,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(MaterialTheme.colorScheme.surfaceContainer)
-                                .height(64.dp)
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            AsyncImage(
-                                model = state.sourceFilesInfo[it].byteArray,
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(4.dp))
-                                    .aspectRatio(1f),
-                            )
-                            Spacer(
-                                modifier = Modifier
-                                    .width(4.dp),
-                            )
-                            Text(
-                                text = state.sourceFilesInfo[it].filename,
-                                overflow = TextOverflow.Ellipsis,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-                        }
+                                .clip(RoundedCornerShape(4.dp))
+                                .aspectRatio(1f),
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .width(4.dp),
+                        )
+                        Text(
+                            text = state.sourceFilesInfo[it].filename,
+                            overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
                     }
                 }
             }
