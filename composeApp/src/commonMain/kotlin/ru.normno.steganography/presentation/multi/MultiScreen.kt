@@ -1,20 +1,18 @@
 package ru.normno.steganography.presentation.multi
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ImageSearch
@@ -31,12 +29,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
+import ru.normno.steganography.presentation.multi.component.ImageCard
 import ru.normno.steganography.util.ImageFormat
 import ru.normno.steganography.util.StegoMethod
 
@@ -206,7 +202,7 @@ fun MultiScreen(
             }
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .widthIn(max = 256.dp)
                     .padding(horizontal = 16.dp),
                 contentPadding = PaddingValues(8.dp),
             ) {
@@ -216,33 +212,34 @@ fun MultiScreen(
                         state.sourceFilesInfo[it].filename
                     }
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.surfaceContainer)
-                            .height(64.dp)
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        AsyncImage(
-                            model = state.sourceFilesInfo[it].byteArray,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(4.dp))
-                                .aspectRatio(1f),
-                        )
-                        Spacer(
-                            modifier = Modifier
-                                .width(4.dp),
-                        )
-                        Text(
-                            text = state.sourceFilesInfo[it].filename,
-                            overflow = TextOverflow.Ellipsis,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
+                    ImageCard(
+                        image = state.sourceFilesInfo[it].byteArray,
+                        filename = state.sourceFilesInfo[it].filename,
+                    )
+                }
+            }
+        }
+        Column(
+            modifier = Modifier
+                .weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .widthIn(max = 256.dp)
+                    .padding(horizontal = 16.dp),
+                contentPadding = PaddingValues(8.dp),
+            ) {
+                items(
+                    count = state.resultFilesInfo.size,
+                    key = {
+                        state.resultFilesInfo[it].filename
                     }
+                ) {
+                    ImageCard(
+                        image = state.resultFilesInfo[it].byteArray,
+                        filename = state.resultFilesInfo[it].filename,
+                    )
                 }
             }
         }
