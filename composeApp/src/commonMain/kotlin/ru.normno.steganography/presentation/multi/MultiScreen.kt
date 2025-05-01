@@ -22,6 +22,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +42,8 @@ fun MultiScreen(
     state: MultiState,
     modifier: Modifier = Modifier,
     onPickImages: () -> Unit,
+    onEmbedData: () -> Unit,
+    setEmbedText: (String) -> Unit,
     onSelectImageFormat: (ImageFormat) -> Unit,
     onSelectStegoMethod: (StegoMethod) -> Unit,
 ) {
@@ -59,6 +62,29 @@ fun MultiScreen(
             modifier = Modifier
                 .weight(1f),
         ) {
+            TextField(
+                value = state.embedText,
+                onValueChange = setEmbedText,
+                minLines = 5,
+                maxLines = 10,
+                label = {
+                    Text(
+                        text = "Text for embedding"
+                    )
+                },
+            )
+            Button(
+                onClick = onEmbedData,
+                enabled = !state.isEbbing && state.sourceFilesInfo.isNotEmpty()
+            ) {
+                Text(
+                    text = "Embed text"
+                )
+            }
+            Spacer(
+                modifier = Modifier
+                    .height(8.dp),
+            )
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
