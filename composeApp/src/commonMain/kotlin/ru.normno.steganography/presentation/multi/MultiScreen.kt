@@ -44,6 +44,7 @@ fun MultiScreen(
     onPickImages: () -> Unit,
     onEmbedData: () -> Unit,
     setEmbedText: (String) -> Unit,
+    onExtractAndSaveTexts: () -> Unit,
     onSelectImageFormat: (ImageFormat) -> Unit,
     onSelectStegoMethod: (StegoMethod) -> Unit,
 ) {
@@ -61,7 +62,27 @@ fun MultiScreen(
         Column(
             modifier = Modifier
                 .weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Button(
+                onClick = onPickImages,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ImageSearch,
+                    contentDescription = null,
+                )
+                Spacer(
+                    modifier = Modifier
+                        .width(4.dp),
+                )
+                Text(
+                    text = "Pick Images"
+                )
+            }
+            Spacer(
+                modifier = Modifier
+                    .height(8.dp),
+            )
             TextField(
                 value = state.embedText,
                 onValueChange = setEmbedText,
@@ -205,30 +226,26 @@ fun MultiScreen(
                     }
                 }
             }
+            Spacer(
+                modifier = Modifier
+                    .height(8.dp),
+            )
+            Button(
+                onClick = onExtractAndSaveTexts,
+            ) {
+                Text(
+                    text = "Extract & Save"
+                )
+            }
         }
         Column(
             modifier = Modifier
-                .weight(3f),
+                .weight(2f),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Button(
-                onClick = onPickImages,
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ImageSearch,
-                    contentDescription = null,
-                )
-                Spacer(
-                    modifier = Modifier
-                        .width(4.dp),
-                )
-                Text(
-                    text = "Pick Images"
-                )
-            }
             LazyColumn(
                 modifier = Modifier
-                    .widthIn(max = 256.dp)
+                    .widthIn(max = 512.dp)
                     .padding(horizontal = 16.dp),
                 contentPadding = PaddingValues(8.dp),
             ) {
@@ -247,12 +264,12 @@ fun MultiScreen(
         }
         Column(
             modifier = Modifier
-                .weight(1f),
+                .weight(2f),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             LazyColumn(
                 modifier = Modifier
-                    .widthIn(max = 256.dp)
+                    .widthIn(max = 512.dp)
                     .padding(horizontal = 16.dp),
                 contentPadding = PaddingValues(8.dp),
             ) {

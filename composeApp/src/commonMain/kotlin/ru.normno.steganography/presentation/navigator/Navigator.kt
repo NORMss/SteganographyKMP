@@ -123,6 +123,7 @@ fun Navigator() {
                         onPickImages = viewModel::onPickSourceImages,
                         onSelectStegoMethod = viewModel::onSelectStegoMethod,
                         onSelectImageFormat = viewModel::onSelectImageFormat,
+                        onExtractAndSaveTexts = viewModel::onExtractAndSaveTexts,
                         setEmbedText = viewModel::setEmbedText,
                         onEmbedData = viewModel::onEmbedData,
                         modifier = Modifier

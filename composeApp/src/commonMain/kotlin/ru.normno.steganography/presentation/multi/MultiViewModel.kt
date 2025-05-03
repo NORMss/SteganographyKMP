@@ -9,22 +9,21 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import ru.normno.steganography.domain.model.FileInfo
+import ru.normno.steganography.domain.model.SecretFile
 import ru.normno.steganography.domain.repository.FileRepository
 import ru.normno.steganography.presentation.home.MainState
 import ru.normno.steganography.util.ImageFormat
 import ru.normno.steganography.util.ImageManager.byteArrayToImage
 import ru.normno.steganography.util.ImageManager.imageToByteArray
 import ru.normno.steganography.util.StegoMethod
-import ru.normno.steganography.util.steganography.Compute
-import ru.normno.steganography.util.steganography.Compute.computeCapacity
-import ru.normno.steganography.util.steganography.Compute.visualAttack
 import ru.normno.steganography.util.steganography.IMNP
 import ru.normno.steganography.util.steganography.INMI
 import ru.normno.steganography.util.steganography.KJB
 import ru.normno.steganography.util.steganography.LSBMatchingRevisited
-import ru.normno.steganography.util.steganography.RSAnalysis
 import java.awt.image.BufferedImage
+import java.time.Instant
 
 class MultiViewModel(
     private val fileRepository: FileRepository,
@@ -81,28 +80,25 @@ class MultiViewModel(
         }
     }
 
-//    fun onSaveModifiedImage() {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            state.value.resultFileInfo?.let { resultFileInfo ->
-//                fileRepository.saveImage(
-//                    FileInfo(
-//                        filename = resultFileInfo.filename + ".${state.value.selectedImageFormat.formatName.lowercase()}",
-//                        byteArray = resultFileInfo.byteArray,
-//                    )
-//                )
-//            }
-//        }
-//    }
+    fun onSaveModifiedImages() {
+        viewModelScope.launch(Dispatchers.IO) {
+            state.value.resultFilesInfo.map { resultFileInfo ->
+                fileRepository.saveImage(
+                    FileInfo(
+                        filename = resultFileInfo.filename + ".${state.value.selectedImageFormat.formatName.lowercase()}",
+                        byteArray = resultFileInfo.byteArray,
+                    )
+                )
+            }
+        }
+    }
 
-//    fun onSaveExtractedText() {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            fileRepository.saveTextToFile(
-//                filename = state.value.resultFileInfo?.filename
-//                    ?: state.value.extractText.substringBeforeLast(" ").substring(0..10),
-//                text = state.value.extractText,
-//            )
-//        }
-//    }
+    fun onExtractAndSaveTexts() {
+        viewModelScope.launch(Dispatchers.IO) {
+            onExtractData()
+            onSaveExtractedTexts()
+        }
+    }
 
     fun onEmbedData() {
         viewModelScope.launch(Dispatchers.Default) {
@@ -134,27 +130,33 @@ class MultiViewModel(
         }
     }
 
-    fun onExtractData() {
-        viewModelScope.launch(Dispatchers.Default) {
-            when (state.value.selectedStegoMethod) {
-                StegoMethod.KJB -> {
-                    extractDataKJB()
-                }
+    private suspend fun onExtractData() {
+        when (state.value.selectedStegoMethod) {
+            StegoMethod.KJB -> {
+                extractDataKJB()
+            }
 
-                StegoMethod.LSBMR -> {
-                    extractDataLSBMR()
-                }
+            StegoMethod.LSBMR -> {
+                extractDataLSBMR()
+            }
 
-                StegoMethod.INMI -> {
-                    extractDataINMI()
-                }
+            StegoMethod.INMI -> {
+                extractDataINMI()
+            }
 
-                StegoMethod.IMNP -> {
-                    extractDataIMNP()
-                }
+            StegoMethod.IMNP -> {
+                extractDataIMNP()
             }
         }
     }
+
+    private suspend fun onSaveExtractedTexts() {
+        fileRepository.saveTextToFile(
+            filename = Instant.now().toString(),
+            text = Json.encodeToString(state.value.extractText),
+        )
+    }
+
 
     private suspend fun embedDataKJB() {
         embedData(kjb::embedData)
@@ -278,7 +280,10 @@ class MultiViewModel(
                 extractMethod(stegoImage).also { text ->
                     state.update {
                         it.copy(
-                            extractText = text,
+                            extractText = state.value.extractText + SecretFile(
+                                fileName = file.filename,
+                                secretText = text,
+                            ),
                         )
                     }
                 }
