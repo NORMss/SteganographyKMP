@@ -16,10 +16,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ImageSearch
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -33,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import ru.normno.steganography.domain.model.FileInfo
 import ru.normno.steganography.presentation.multi.component.ImageCard
 import ru.normno.steganography.util.ImageFormat
 import ru.normno.steganography.util.StegoMethod
@@ -44,6 +47,8 @@ fun MultiScreen(
     onPickImages: () -> Unit,
     onEmbedData: () -> Unit,
     setEmbedText: (String) -> Unit,
+    onSaveModifiedImage: (FileInfo) -> Unit,
+    onSaveModifiedImages: () -> Unit,
     onExtractAndSaveTexts: () -> Unit,
     onSelectImageFormat: (ImageFormat) -> Unit,
     onSelectStegoMethod: (StegoMethod) -> Unit,
@@ -232,9 +237,22 @@ fun MultiScreen(
             )
             Button(
                 onClick = onExtractAndSaveTexts,
+                enabled = state.resultFilesInfo.isNotEmpty(),
             ) {
                 Text(
                     text = "Extract & Save"
+                )
+            }
+            Spacer(
+                modifier = Modifier
+                    .height(8.dp),
+            )
+            Button(
+                onClick = onSaveModifiedImages,
+                enabled = state.resultFilesInfo.isNotEmpty(),
+            ) {
+                Text(
+                    text = "Save Images"
                 )
             }
         }
@@ -258,7 +276,9 @@ fun MultiScreen(
                     ImageCard(
                         image = state.sourceFilesInfo[it].byteArray,
                         filename = state.sourceFilesInfo[it].filename,
-                    )
+                    ) {
+
+                    }
                 }
             }
         }
@@ -282,7 +302,18 @@ fun MultiScreen(
                     ImageCard(
                         image = state.resultFilesInfo[it].byteArray,
                         filename = state.resultFilesInfo[it].filename,
-                    )
+                    ) {
+                        IconButton(
+                            onClick = {
+                                onSaveModifiedImage(state.resultFilesInfo[it])
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Save,
+                                contentDescription = null,
+                            )
+                        }
+                    }
                 }
             }
         }

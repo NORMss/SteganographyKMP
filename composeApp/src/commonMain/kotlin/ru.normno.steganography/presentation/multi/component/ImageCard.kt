@@ -2,6 +2,7 @@ package ru.normno.steganography.presentation.multi.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,7 +25,8 @@ import coil3.compose.AsyncImage
 fun ImageCard(
     image: ByteArray,
     filename: String,
-){
+    action: @Composable RowScope.() -> Unit,
+) {
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(16.dp))
@@ -51,6 +53,7 @@ fun ImageCard(
             overflow = TextOverflow.Ellipsis,
             color = MaterialTheme.colorScheme.onSurface,
         )
+        action()
     }
 
 }

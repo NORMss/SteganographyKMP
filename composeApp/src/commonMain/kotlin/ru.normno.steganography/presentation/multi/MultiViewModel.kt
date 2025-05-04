@@ -23,8 +23,10 @@ import ru.normno.steganography.util.steganography.INMI
 import ru.normno.steganography.util.steganography.KJB
 import ru.normno.steganography.util.steganography.LSBMatchingRevisited
 import java.awt.image.BufferedImage
-import java.time.Instant
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class MultiViewModel(
     private val fileRepository: FileRepository,
 ) : ViewModel() {
@@ -93,6 +95,17 @@ class MultiViewModel(
         }
     }
 
+    fun onSaveModifiedImage(fileInfo: FileInfo) {
+        viewModelScope.launch(Dispatchers.IO) {
+            fileRepository.saveImage(
+                FileInfo(
+                    filename = fileInfo.filename + ".${state.value.selectedImageFormat.formatName.lowercase()}",
+                    byteArray = fileInfo.byteArray,
+                )
+            )
+        }
+    }
+
     fun onExtractAndSaveTexts() {
         viewModelScope.launch(Dispatchers.IO) {
             onExtractData()
@@ -152,7 +165,7 @@ class MultiViewModel(
 
     private suspend fun onSaveExtractedTexts() {
         fileRepository.saveTextToFile(
-            filename = Instant.now().toString(),
+            filename = "DDMMYYYY_HHmmss".format(Clock.System.now()) + "_images_${state.value.resultFilesInfo.size}",
             text = Json.encodeToString(state.value.extractText),
         )
     }
