@@ -18,6 +18,7 @@ import ru.normno.steganography.util.ImageFormat
 import ru.normno.steganography.util.ImageManager.byteArrayToImage
 import ru.normno.steganography.util.ImageManager.imageToByteArray
 import ru.normno.steganography.util.StegoMethod
+import ru.normno.steganography.util.steganography.Compute
 import ru.normno.steganography.util.steganography.IMNP
 import ru.normno.steganography.util.steganography.INMI
 import ru.normno.steganography.util.steganography.KJB
@@ -133,7 +134,7 @@ class MultiViewModel(
                 }
             }
 //            compute()
-//            visualAttack()
+            visualAttack()
         }
     }
 
@@ -223,25 +224,25 @@ class MultiViewModel(
 //        }
 //    }
 
-//    private fun visualAttack() {
-//        state.value.sourceFilesInfo[1].let { sourceFileInfo ->
-//            state.value.resultFilesInfo[1].let { resultFileInfo ->
-//                Compute.visualAttack(
-//                    coverImage = byteArrayToImage(sourceFileInfo.byteArray),
-//                    stegoImage = byteArrayToImage(resultFileInfo.byteArray),
-//                ).also { visualAttack ->
-//                    state.update {
-//                        it.copy(
-//                            visualAttackFileInfo = FileInfo(
-//                                filename = sourceFileInfo.filename + "_visual_attack",
-//                                byteArray = imageToByteArray(visualAttack)
-//                            )
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//    }
+    private fun visualAttack() {
+        state.value.sourceFilesInfo.forEachIndexed { index, sourceFileInfo ->
+            state.value.resultFilesInfo[index].let { resultFileInfo ->
+                Compute.visualAttack(
+                    coverImage = byteArrayToImage(sourceFileInfo.byteArray),
+                    stegoImage = byteArrayToImage(resultFileInfo.byteArray),
+                ).also { visualAttack ->
+                    state.update {
+                        it.copy(
+                            visualAttackFilesInfo = state.value.visualAttackFilesInfo + FileInfo(
+                                filename = sourceFileInfo.filename + "_visual_attack",
+                                byteArray = imageToByteArray(visualAttack)
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     private suspend fun embedData(
         embedMethod: (BufferedImage, String) -> BufferedImage?,
