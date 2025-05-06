@@ -438,22 +438,22 @@ fun MainScreen(
                         text = "Analysis"
                     )
                 }
-                if (state.psnrTotaldBm != null && state.capacityTotalKb != null) {
+                if (state.testInfo != null) {
                     Spacer(
                         modifier = Modifier
                             .height(8.dp),
                     )
                     Text(
-                        text = ("Maximum capacity: ${"%.2f".format(state.capacityTotalKb)} Kb\n" +
-                                "PSNR: ${"%.2f".format(state.psnrTotaldBm)} dBm\n" +
+                        text = ("Maximum capacity: ${"%.2f".format(state.testInfo.capacityTotalKb)} Kb\n" +
+                                "PSNR: ${"%.2f".format(state.testInfo.psnrTotaldBm)} dBm\n" +
                                 "RS: ${
-                                    state.rsTotal.joinToString(
+                                    state.testInfo.rsTotal.joinToString(
                                         ", ",
                                         transform = { "%.2f".format(it) })
                                 } " +
-                                "ChiSquare: ${"%.2f".format(state.chiSquareTotal)}\n" +
-                                "Aump: ${"%.2f".format(state.aumpTotal)}\n" +
-                                "Compression: ${"%.2f".format(state.compressionTotal)}").also {
+                                "ChiSquare: ${"%.2f".format(state.testInfo.chiSquareTotal)}\n" +
+                                "Aump: ${"%.2f".format(state.testInfo.aumpTotal)}\n" +
+                                "Compression: ${"%.2f".format(state.testInfo.compressionTotal)}").also {
                             println(it)
                         }
                     )

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.normno.steganography.domain.model.FileInfo
+import ru.normno.steganography.domain.model.TestInfo
 import ru.normno.steganography.domain.repository.FileRepository
 import ru.normno.steganography.util.ImageFormat
 import ru.normno.steganography.util.ImageManager.byteArrayToImage
@@ -242,12 +243,14 @@ class MainViewModel(
 
                 state.update {
                     it.copy(
-                        psnrTotaldBm = Compute.computePSNR(cover, stego),
-                        capacityTotalKb = computeCapacity(cover) / 8.0,
-                        rsTotal = RSAnalysis.doAnalysis(stego).toList(),
-                        chiSquareTotal = Compute.chiSquareTest(stego, 4),
-                        aumpTotal = Compute.aumpTest(stego, 4, 2),
-                        compressionTotal = Compute.compressionAnalysis(cover, stego),
+                        testInfo = TestInfo(
+                            psnrTotaldBm = Compute.computePSNR(cover, stego),
+                            capacityTotalKb = computeCapacity(cover) / 8.0,
+                            rsTotal = RSAnalysis.doAnalysis(stego).toList(),
+                            chiSquareTotal = Compute.chiSquareTest(stego, 4),
+                            aumpTotal = Compute.aumpTest(stego, 4, 2),
+                            compressionTotal = Compute.compressionAnalysis(cover, stego),
+                        )
                     )
                 }
             }

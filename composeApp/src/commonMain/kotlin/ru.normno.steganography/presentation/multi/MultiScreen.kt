@@ -13,11 +13,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ImageSearch
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -31,12 +34,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import ru.normno.steganography.domain.model.FileInfo
 import ru.normno.steganography.presentation.multi.component.ImageCard
 import ru.normno.steganography.util.ImageFormat
@@ -62,8 +67,12 @@ fun MultiScreen(
         mutableStateOf(false)
     }
 
-    val isCheckedSwitchVisualAttack = remember {
-        mutableStateListOf<Boolean>()
+    val isSelectedVisualAttack = rememberSaveable {
+        mutableStateListOf<String>()
+    }
+
+    var showTestInfo by remember {
+        mutableStateOf(false)
     }
 
     Row(
@@ -305,9 +314,11 @@ fun MultiScreen(
                         state.resultFilesInfo[it].filename
                     }
                 ) {
+                    val imageSelected =
+                        isSelectedVisualAttack.contains(state.resultFilesInfo[it].filename)
                     ImageCard(
-                        image = state.resultFilesInfo[it].byteArray,
-                        filename = state.resultFilesInfo[it].filename,
+                        image = if (imageSelected) state.visualAttackFilesInfo[it].byteArray else state.resultFilesInfo[it].byteArray,
+                        filename = if (imageSelected) state.visualAttackFilesInfo[it].filename else state.resultFilesInfo[it].filename,
                     ) {
                         IconButton(
                             onClick = {
@@ -321,9 +332,66 @@ fun MultiScreen(
                         }
                         Spacer(
                             modifier = Modifier
-                                .width(8.dp),
+                                .width(4.dp),
                         )
+                        Switch(
+                            checked = imageSelected,
+                            onCheckedChange = { check ->
+                                if (imageSelected)
+                                    isSelectedVisualAttack.remove(state.resultFilesInfo[it].filename)
+                                else
+                                    isSelectedVisualAttack.add(state.resultFilesInfo[it].filename)
+                            }
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .width(4.dp),
+                        )
+                        IconButton(
+                            onClick = {
+                                showTestInfo = true
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = null,
+                            )
+                        }
+
                     }
+                    if (showTestInfo) {
+                        Dialog(
+                            onDismissRequest = {
+                                showTestInfo = false
+                            },
+                        ) {
+                            Card(
+                                shape = RoundedCornerShape(16.dp),
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .padding(16.dp),
+                                ) {
+                                    Text(
+                                        text = ("Maximum capacity: ${"%.2f".format(state.testsInfo[it].capacityTotalKb)} Kb\n" +
+                                                "PSNR: ${"%.2f".format(state.testsInfo[it].psnrTotaldBm)} dBm\n" +
+                                                "RS: ${
+                                                    state.testsInfo[it].rsTotal.joinToString(
+                                                        ", ",
+                                                        transform = { "%.2f".format(it) })
+                                                } " +
+                                                "ChiSquare: ${"%.2f".format(state.testsInfo[it].chiSquareTotal)}\n" +
+                                                "Aump: ${"%.2f".format(state.testsInfo[it].aumpTotal)}\n" +
+                                                "Compression: ${"%.2f".format(state.testsInfo[it].compressionTotal)}").also {
+                                            println(it)
+                                        }
+                                    )
+
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
         }

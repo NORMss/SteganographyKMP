@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import ru.normno.steganography.domain.model.FileInfo
 import ru.normno.steganography.domain.model.SecretFile
+import ru.normno.steganography.domain.model.TestInfo
 import ru.normno.steganography.domain.repository.FileRepository
 import ru.normno.steganography.presentation.home.MainState
 import ru.normno.steganography.util.ImageFormat
@@ -19,10 +20,12 @@ import ru.normno.steganography.util.ImageManager.byteArrayToImage
 import ru.normno.steganography.util.ImageManager.imageToByteArray
 import ru.normno.steganography.util.StegoMethod
 import ru.normno.steganography.util.steganography.Compute
+import ru.normno.steganography.util.steganography.Compute.computeCapacity
 import ru.normno.steganography.util.steganography.IMNP
 import ru.normno.steganography.util.steganography.INMI
 import ru.normno.steganography.util.steganography.KJB
 import ru.normno.steganography.util.steganography.LSBMatchingRevisited
+import ru.normno.steganography.util.steganography.RSAnalysis
 import java.awt.image.BufferedImage
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -133,14 +136,14 @@ class MultiViewModel(
                     embedDataIMNP()
                 }
             }
-//            compute()
             visualAttack()
+            compute()
         }
     }
 
     fun onAnalysis() {
         viewModelScope.launch(Dispatchers.Default) {
-//            compute()
+            compute()
         }
     }
 
@@ -204,25 +207,27 @@ class MultiViewModel(
         extractData(imnp::extractData)
     }
 
-//    private fun compute() {
-//        state.value.sourceFileInfo?.let { sourceFileInfo ->
-//            state.value.resultFileInfo?.let { resultFileInfo ->
-//                val cover = byteArrayToImage(sourceFileInfo.byteArray)
-//                val stego = byteArrayToImage(resultFileInfo.byteArray)
-//
-//                state.update {
-//                    it.copy(
-//                        psnrTotaldBm = Compute.computePSNR(cover, stego),
-//                        capacityTotalKb = computeCapacity(cover) / 8.0,
-//                        rsTotal = RSAnalysis.doAnalysis(stego).toList(),
-//                        chiSquareTotal = Compute.chiSquareTest(stego, 4),
-//                        aumpTotal = Compute.aumpTest(stego, 4, 2),
-//                        compressionTotal = Compute.compressionAnalysis(cover, stego),
-//                    )
-//                }
-//            }
-//        }
-//    }
+    private fun compute() {
+        state.value.sourceFilesInfo.forEachIndexed { index, sourceFileInfo ->
+            state.value.resultFilesInfo[index].let { resultFileInfo ->
+                val cover = byteArrayToImage(sourceFileInfo.byteArray)
+                val stego = byteArrayToImage(resultFileInfo.byteArray)
+                state.update {
+                    it.copy(
+                        testsInfo = state.value.testsInfo + TestInfo(
+                            psnrTotaldBm = Compute.computePSNR(cover, stego),
+                            capacityTotalKb = computeCapacity(cover) / 8.0,
+                            rsTotal = RSAnalysis.doAnalysis(stego).toList(),
+                            chiSquareTotal = Compute.chiSquareTest(stego, 16),
+                            aumpTotal = Compute.aumpTest(stego, 4, 2),
+                            compressionTotal = Compute.compressionAnalysis(cover, stego),
+                        )
+                    )
+                }
+            }
+        }
+        println(state.value.testsInfo.first())
+    }
 
     private fun visualAttack() {
         state.value.sourceFilesInfo.forEachIndexed { index, sourceFileInfo ->
