@@ -254,6 +254,7 @@ class MultiViewModel(
     ) {
         state.update {
             it.copy(
+                resultFilesInfo = emptyList(),
                 isEbbing = true,
             )
         }
