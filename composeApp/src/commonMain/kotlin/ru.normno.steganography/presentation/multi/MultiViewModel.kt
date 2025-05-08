@@ -208,6 +208,7 @@ class MultiViewModel(
     }
 
     private fun compute() {
+        state.update { it.copy(testsInfo = emptyList()) }
         state.value.sourceFilesInfo.forEachIndexed { index, sourceFileInfo ->
             state.value.resultFilesInfo[index].let { resultFileInfo ->
                 val cover = byteArrayToImage(sourceFileInfo.byteArray)
@@ -230,6 +231,7 @@ class MultiViewModel(
     }
 
     private fun visualAttack() {
+        state.update { it.copy(visualAttackFilesInfo = emptyList()) }
         state.value.sourceFilesInfo.forEachIndexed { index, sourceFileInfo ->
             state.value.resultFilesInfo[index].let { resultFileInfo ->
                 Compute.visualAttack(
