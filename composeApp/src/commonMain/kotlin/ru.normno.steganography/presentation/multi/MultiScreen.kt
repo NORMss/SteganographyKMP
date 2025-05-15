@@ -1,5 +1,6 @@
 package ru.normno.steganography.presentation.multi
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,9 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -31,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,10 +42,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import coil3.compose.AsyncImage
 import ru.normno.steganography.domain.model.FileInfo
 import ru.normno.steganography.presentation.multi.component.ImageCard
 import ru.normno.steganography.util.ImageFormat
@@ -73,6 +80,18 @@ fun MultiScreen(
 
     var showTestInfo by remember {
         mutableStateOf(false)
+    }
+
+    var selectedTestInfo by remember {
+        mutableIntStateOf(-1)
+    }
+
+    var showScaleImage by remember {
+        mutableStateOf(false)
+    }
+
+    var scaleImage by remember {
+        mutableStateOf(FileInfo())
     }
 
     Row(
@@ -289,8 +308,11 @@ fun MultiScreen(
                     }
                 ) {
                     ImageCard(
-                        image = state.sourceFilesInfo[it].byteArray,
-                        filename = state.sourceFilesInfo[it].filename,
+                        onOpenImage = { image ->
+                            showScaleImage = true
+                            scaleImage = image
+                        },
+                        fileInfo = state.sourceFilesInfo[it],
                     ) {
 
                     }
@@ -317,8 +339,11 @@ fun MultiScreen(
                     val imageSelected =
                         isSelectedVisualAttack.contains(state.resultFilesInfo[it].filename)
                     ImageCard(
-                        image = if (imageSelected) state.visualAttackFilesInfo[it].byteArray else state.resultFilesInfo[it].byteArray,
-                        filename = if (imageSelected) state.visualAttackFilesInfo[it].filename else state.resultFilesInfo[it].filename,
+                        onOpenImage = { image ->
+                            showScaleImage = true
+                            scaleImage = image
+                        },
+                        fileInfo = if (imageSelected) state.visualAttackFilesInfo[it] else state.resultFilesInfo[it],
                     ) {
                         IconButton(
                             onClick = {
@@ -341,7 +366,8 @@ fun MultiScreen(
                                     isSelectedVisualAttack.remove(state.resultFilesInfo[it].filename)
                                 else
                                     isSelectedVisualAttack.add(state.resultFilesInfo[it].filename)
-                            }
+                            },
+                            enabled = state.visualAttackFilesInfo.size > it
                         )
                         Spacer(
                             modifier = Modifier
@@ -349,15 +375,47 @@ fun MultiScreen(
                         )
                         IconButton(
                             onClick = {
+                                selectedTestInfo = it
                                 showTestInfo = true
-                            }
+                            },
+                            enabled = state.testsInfo.size > it,
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Info,
                                 contentDescription = null,
                             )
                         }
-
+                        if (state.testsInfo.size > it) {
+                            Spacer(
+                                modifier = Modifier
+                                    .width(4.dp),
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .background(
+                                        when (state.testsInfo[it].rsTotal[26]) {
+                                            in 0.0..0.009 -> Color.Green
+                                            in 0.0091..0.03 -> Color.Yellow
+                                            in 0.031..1.0 -> Color.Red
+                                            else -> Color.Gray
+                                        }
+                                    )
+                                    .size(12.dp),
+                            )
+                        }
+                    }
+                    if (showScaleImage) {
+                        Dialog(
+                            onDismissRequest = {
+                                showScaleImage = false
+                            }
+                        ) {
+                            AsyncImage(
+                                model = scaleImage.byteArray,
+                                contentDescription = null,
+                            )
+                        }
                     }
                     if (showTestInfo) {
                         Dialog(
@@ -368,25 +426,28 @@ fun MultiScreen(
                             Card(
                                 shape = RoundedCornerShape(16.dp),
                             ) {
+                                val testInfo = state.testsInfo[selectedTestInfo]
+
+                                val rs26 = "%.2f".format(testInfo.rsTotal[26])
+                                val rs27 = "%.2f".format(testInfo.rsTotal[27])
+
+                                val fullText = buildString {
+                                    appendLine("Maximum capacity: %.2f Kb".format(testInfo.capacityTotalKb))
+                                    appendLine("PSNR: %.2f dBm".format(testInfo.psnrTotaldBm))
+                                    appendLine("RS:")
+                                    appendLine("  Estimated message length (pixels %): $rs26%")
+                                    appendLine("  Estimated message length (bytes): $rs27")
+                                    appendLine("ChiSquare: %.2f".format(testInfo.chiSquareTotal))
+                                    appendLine("Aump: %.2f".format(testInfo.aumpTotal))
+                                    appendLine("Compression: %.2f".format(testInfo.compressionTotal))
+                                }
                                 Column(
                                     modifier = Modifier
                                         .padding(16.dp),
                                 ) {
                                     Text(
-                                        text = ("Maximum capacity: ${"%.2f".format(state.testsInfo[it].capacityTotalKb)} Kb\n" +
-                                                "PSNR: ${"%.2f".format(state.testsInfo[it].psnrTotaldBm)} dBm\n" +
-                                                "RS: ${
-                                                    state.testsInfo[it].rsTotal.joinToString(
-                                                        ", ",
-                                                        transform = { "%.2f".format(it) })
-                                                } " +
-                                                "ChiSquare: ${"%.2f".format(state.testsInfo[it].chiSquareTotal)}\n" +
-                                                "Aump: ${"%.2f".format(state.testsInfo[it].aumpTotal)}\n" +
-                                                "Compression: ${"%.2f".format(state.testsInfo[it].compressionTotal)}").also {
-                                            println(it)
-                                        }
+                                        text = fullText,
                                     )
-
                                 }
                             }
                         }

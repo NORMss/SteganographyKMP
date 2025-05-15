@@ -1,6 +1,7 @@
 package ru.normno.steganography.presentation.multi.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -20,11 +21,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import ru.normno.steganography.domain.model.FileInfo
 
 @Composable
 fun ImageCard(
-    image: ByteArray,
-    filename: String,
+    onOpenImage: (FileInfo) -> Unit,
+    fileInfo: FileInfo,
     action: @Composable RowScope.() -> Unit,
 ) {
     Row(
@@ -37,19 +39,22 @@ fun ImageCard(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AsyncImage(
-            model = image,
+            model = fileInfo.byteArray,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .clip(RoundedCornerShape(4.dp))
-                .aspectRatio(1f),
+                .aspectRatio(1f)
+                .clickable {
+                    onOpenImage(fileInfo)
+                },
         )
         Spacer(
             modifier = Modifier
                 .width(4.dp),
         )
         Text(
-            text = filename,
+            text = fileInfo.filename,
             overflow = TextOverflow.Ellipsis,
             color = MaterialTheme.colorScheme.onSurface,
         )

@@ -1,5 +1,6 @@
 package ru.normno.steganography.presentation.multi
 
+import RSAnalysis
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +26,6 @@ import ru.normno.steganography.util.steganography.IMNP
 import ru.normno.steganography.util.steganography.INMI
 import ru.normno.steganography.util.steganography.KJB
 import ru.normno.steganography.util.steganography.LSBMatchingRevisited
-import ru.normno.steganography.util.steganography.RSAnalysis
 import java.awt.image.BufferedImage
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -38,6 +38,7 @@ class MultiViewModel(
     private val lsbmr = LSBMatchingRevisited()
     private val inmi = INMI()
     private val imnp = IMNP()
+    private val rsAnalysis = RSAnalysis(2, 2)
 
     val state: StateFlow<MultiState>
         field = MutableStateFlow(MultiState())
@@ -218,7 +219,11 @@ class MultiViewModel(
                         testsInfo = state.value.testsInfo + TestInfo(
                             psnrTotaldBm = Compute.computePSNR(cover, stego),
                             capacityTotalKb = computeCapacity(cover) / 8.0,
-                            rsTotal = RSAnalysis.doAnalysis(stego).toList(),
+                            rsTotal = rsAnalysis.doAnalysis(
+                                stego,
+                                RSAnalysis.ANALYSIS_COLOUR_RED,
+                                true
+                            )?.toList() ?: emptyList(),
                             chiSquareTotal = Compute.chiSquareTest(stego, 16),
                             aumpTotal = Compute.aumpTest(stego, 4, 2),
                             compressionTotal = Compute.compressionAnalysis(cover, stego),

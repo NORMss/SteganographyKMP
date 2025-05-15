@@ -32,18 +32,20 @@ object Compute {
     fun chiSquareTest(image: BufferedImage, blockSize: Int): Double {
         val width = image.width
         val height = image.height
-        var chiSquare = 0.0
+        var chiSquareSum = 0.0
         var totalBlocks = 0
 
         for (x in 0 until width step blockSize) {
             for (y in 0 until height step blockSize) {
-                val histogram = IntArray(256) // Стандартный 8-битный гистограмный тест
+                val histogram = IntArray(256)
                 var totalPixels = 0
 
                 for (i in 0 until blockSize) {
                     for (j in 0 until blockSize) {
-                        if (x + i < width && y + j < height) {
-                            val pixel = image.getRGB(x + i, y + j) and 0xFF
+                        val xi = x + i
+                        val yj = y + j
+                        if (xi < width && yj < height) {
+                            val pixel = image.getRGB(xi, yj) and 0xFF // grayscale
                             histogram[pixel]++
                             totalPixels++
                         }
@@ -51,14 +53,23 @@ object Compute {
                 }
 
                 if (totalPixels > 0) {
-                    val expected = totalPixels / 256.0 // Ожидаемое распределение
-                    chiSquare += histogram.sumOf { if (expected > 0) ((it - expected).pow(2)) / expected else 0.0 }
+                    // Классический LSB chi-square тест
+                    for (i in 0 until 128) {
+                        val observed0 = histogram[2 * i]
+                        val observed1 = histogram[2 * i + 1]
+                        val expected = (observed0 + observed1) / 2.0
+
+                        if (expected > 0) {
+                            chiSquareSum += ((observed0 - expected).pow(2)) / expected
+                            chiSquareSum += ((observed1 - expected).pow(2)) / expected
+                        }
+                    }
                     totalBlocks++
                 }
             }
         }
 
-        return if (totalBlocks > 0) chiSquare / totalBlocks else chiSquare
+        return if (totalBlocks > 0) chiSquareSum / totalBlocks else 0.0
     }
 
     fun aumpTest(image: BufferedImage, blockSize: Int, degree: Int): Double {

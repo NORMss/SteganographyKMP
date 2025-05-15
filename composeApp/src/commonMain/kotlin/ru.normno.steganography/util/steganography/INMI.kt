@@ -3,7 +3,6 @@ package ru.normno.steganography.util.steganography
 import ru.normno.steganography.util.TextManager.bitsToTextWithMarker
 import ru.normno.steganography.util.TextManager.textToBitsWithMarker
 import java.awt.image.BufferedImage
-import java.util.*
 
 class INMI() {
 
