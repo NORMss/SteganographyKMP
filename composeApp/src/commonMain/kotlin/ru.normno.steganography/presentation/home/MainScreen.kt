@@ -50,7 +50,7 @@ import coil3.compose.AsyncImage
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import ru.normno.steganography.domain.model.FileInfo
 import ru.normno.steganography.util.ImageFormat
-import ru.normno.steganography.util.StegoMethod
+import ru.normno.steganography.util.StegoImageMethod
 
 @Composable
 fun MainScreen(
@@ -62,7 +62,7 @@ fun MainScreen(
     onExtractData: () -> Unit,
     onSaveModifiedImage: () -> Unit,
     onSelectImageFormat: (ImageFormat) -> Unit,
-    onSelectStegoMethod: (StegoMethod) -> Unit,
+    onSelectStegoMethod: (StegoImageMethod) -> Unit,
     onRecoverOriginalImageINMI: () -> Unit,
     onSaveExtractedText: () -> Unit,
     setEmbedText: (String) -> Unit,
@@ -193,7 +193,7 @@ fun MainScreen(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = state.selectedStegoMethod::class.simpleName ?: "Unknown",
+                            text = state.selectedStegoImageMethod::class.simpleName ?: "Unknown",
                             color = if (state.sourceFileInfo != null)
                                 MaterialTheme.colorScheme.onBackground
                             else
@@ -221,10 +221,10 @@ fun MainScreen(
                         onDismissRequest = { isSelectStegoMethod = false },
                     ) {
                         listOf(
-                            StegoMethod.KJB,
-                            StegoMethod.LSBMR,
-                            StegoMethod.INMI,
-                            StegoMethod.IMNP,
+                            StegoImageMethod.KJB,
+                            StegoImageMethod.LSBMR,
+                            StegoImageMethod.INMI,
+                            StegoImageMethod.IMNP,
                         ).forEach { method ->
                             DropdownMenuItem(
                                 onClick = {
@@ -323,7 +323,7 @@ fun MainScreen(
                                 clip = true
                             },
                     )
-                    if (state.resultFileInfo != null && state.selectedStegoMethod is StegoMethod.INMI) {
+                    if (state.resultFileInfo != null && state.selectedStegoImageMethod is StegoImageMethod.INMI) {
                         IconButton(
                             onClick = {
                                 onRecoverOriginalImageINMI()

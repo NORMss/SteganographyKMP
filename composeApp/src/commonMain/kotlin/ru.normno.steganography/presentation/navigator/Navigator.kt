@@ -6,9 +6,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.StackedBarChart
+import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.StackedBarChart
+import androidx.compose.material.icons.outlined.TextFields
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -36,6 +38,8 @@ import ru.normno.steganography.presentation.home.MainScreen
 import ru.normno.steganography.presentation.home.MainViewModel
 import ru.normno.steganography.presentation.multi.MultiScreen
 import ru.normno.steganography.presentation.multi.MultiViewModel
+import ru.normno.steganography.presentation.text.TextScreen
+import ru.normno.steganography.presentation.text.TextViewModel
 
 @Composable
 fun Navigator() {
@@ -60,7 +64,8 @@ fun Navigator() {
                             when (index) {
                                 0 -> navigateToTab(navController, Route.Home)
                                 1 -> navigateToTab(navController, Route.Multi)
-                                2 -> navigateToTab(navController, Route.About)
+                                2 -> navigateToTab(navController, Route.Text)
+                                3 -> navigateToTab(navController, Route.About)
                             }
                         },
                         icon = {
@@ -131,6 +136,18 @@ fun Navigator() {
                         modifier = Modifier
                     )
                 }
+                composable<Route.Text> {
+                    val viewModel = koinViewModel<TextViewModel>()
+                    val state by viewModel.state.collectAsStateWithLifecycle()
+                    TextScreen(
+                        onEmbed = viewModel::onEmbed,
+                        onExtract = viewModel::onExtract,
+                        onSelectStegoMethod = viewModel::onSelectMethod,
+                        setSecretText = viewModel::setSecretText,
+                        setOriginalText = viewModel::setOriginalText,
+                        state = state,
+                    )
+                }
                 composable<Route.About> {
                     AboutScreen()
                 }
@@ -162,5 +179,6 @@ enum class Screen(
 ) {
     HOME("Home", Icons.Default.Home, Icons.Outlined.Home),
     MULTI("Multi", Icons.Default.StackedBarChart, Icons.Outlined.StackedBarChart),
+    TEXT("Text", Icons.Default.TextFields, Icons.Outlined.TextFields),
     ABOUT("About", Icons.Default.Info, Icons.Outlined.Info);
 }

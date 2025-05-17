@@ -52,7 +52,7 @@ import coil3.compose.AsyncImage
 import ru.normno.steganography.domain.model.FileInfo
 import ru.normno.steganography.presentation.multi.component.ImageCard
 import ru.normno.steganography.util.ImageFormat
-import ru.normno.steganography.util.StegoMethod
+import ru.normno.steganography.util.StegoImageMethod
 
 @Composable
 fun MultiScreen(
@@ -65,7 +65,7 @@ fun MultiScreen(
     onSaveModifiedImages: () -> Unit,
     onExtractAndSaveTexts: () -> Unit,
     onSelectImageFormat: (ImageFormat) -> Unit,
-    onSelectStegoMethod: (StegoMethod) -> Unit,
+    onSelectStegoMethod: (StegoImageMethod) -> Unit,
 ) {
     var isSelectImageFormat by remember {
         mutableStateOf(false)
@@ -159,7 +159,7 @@ fun MultiScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = state.selectedStegoMethod::class.simpleName ?: "Unknown",
+                        text = state.selectedStegoImageMethod::class.simpleName ?: "Unknown",
                         color = if (state.sourceFilesInfo.isEmpty())
                             MaterialTheme.colorScheme.onBackground
                         else
@@ -187,10 +187,10 @@ fun MultiScreen(
                     onDismissRequest = { isSelectStegoMethod = false },
                 ) {
                     listOf(
-                        StegoMethod.KJB,
-                        StegoMethod.LSBMR,
-                        StegoMethod.INMI,
-                        StegoMethod.IMNP,
+                        StegoImageMethod.KJB,
+                        StegoImageMethod.LSBMR,
+                        StegoImageMethod.INMI,
+                        StegoImageMethod.IMNP,
                     ).forEach { method ->
                         DropdownMenuItem(
                             onClick = {

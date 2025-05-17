@@ -4,7 +4,7 @@ import ru.normno.steganography.domain.model.SecretFile
 import ru.normno.steganography.domain.model.FileInfo
 import ru.normno.steganography.domain.model.TestInfo
 import ru.normno.steganography.util.ImageFormat
-import ru.normno.steganography.util.StegoMethod
+import ru.normno.steganography.util.StegoImageMethod
 
 data class MultiState(
     val sourceFilesInfo: List<FileInfo> = emptyList(),
@@ -12,7 +12,7 @@ data class MultiState(
     val testsInfo: List<TestInfo> = emptyList(),
     val visualAttackFilesInfo: List<FileInfo> = emptyList(),
     val selectedImageFormat: ImageFormat = ImageFormat.PNG(),
-    val selectedStegoMethod: StegoMethod = StegoMethod.KJB,
+    val selectedStegoImageMethod: StegoImageMethod = StegoImageMethod.KJB,
     val embedText: String = "",
     val extractText: List<SecretFile> = emptyList(),
     val isEbbing: Boolean = false,

@@ -19,7 +19,7 @@ import ru.normno.steganography.presentation.home.MainState
 import ru.normno.steganography.util.ImageFormat
 import ru.normno.steganography.util.ImageManager.byteArrayToImage
 import ru.normno.steganography.util.ImageManager.imageToByteArray
-import ru.normno.steganography.util.StegoMethod
+import ru.normno.steganography.util.StegoImageMethod
 import ru.normno.steganography.util.steganography.Compute
 import ru.normno.steganography.util.steganography.Compute.computeCapacity
 import ru.normno.steganography.util.steganography.IMNP
@@ -60,10 +60,10 @@ class MultiViewModel(
         }
     }
 
-    fun onSelectStegoMethod(stegoMethod: StegoMethod) {
+    fun onSelectStegoMethod(stegoImageMethod: StegoImageMethod) {
         state.update {
             it.copy(
-                selectedStegoMethod = stegoMethod,
+                selectedStegoImageMethod = stegoImageMethod,
             )
         }
     }
@@ -120,20 +120,20 @@ class MultiViewModel(
 
     fun onEmbedData() {
         viewModelScope.launch(Dispatchers.Default) {
-            when (state.value.selectedStegoMethod) {
-                StegoMethod.KJB -> {
+            when (state.value.selectedStegoImageMethod) {
+                StegoImageMethod.KJB -> {
                     embedDataKJB()
                 }
 
-                StegoMethod.LSBMR -> {
+                StegoImageMethod.LSBMR -> {
                     embedDataLSBMR()
                 }
 
-                StegoMethod.INMI -> {
+                StegoImageMethod.INMI -> {
                     embedDataINMI()
                 }
 
-                StegoMethod.IMNP -> {
+                StegoImageMethod.IMNP -> {
                     embedDataIMNP()
                 }
             }
@@ -149,20 +149,20 @@ class MultiViewModel(
     }
 
     private suspend fun onExtractData() {
-        when (state.value.selectedStegoMethod) {
-            StegoMethod.KJB -> {
+        when (state.value.selectedStegoImageMethod) {
+            StegoImageMethod.KJB -> {
                 extractDataKJB()
             }
 
-            StegoMethod.LSBMR -> {
+            StegoImageMethod.LSBMR -> {
                 extractDataLSBMR()
             }
 
-            StegoMethod.INMI -> {
+            StegoImageMethod.INMI -> {
                 extractDataINMI()
             }
 
-            StegoMethod.IMNP -> {
+            StegoImageMethod.IMNP -> {
                 extractDataIMNP()
             }
         }

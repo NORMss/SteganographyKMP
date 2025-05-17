@@ -11,5 +11,8 @@ sealed class Route {
     data object Multi : Route()
 
     @Serializable
+    data object Text : Route()
+
+    @Serializable
     data object About : Route()
 }

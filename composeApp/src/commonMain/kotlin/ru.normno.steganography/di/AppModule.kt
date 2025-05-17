@@ -8,6 +8,7 @@ import ru.normno.steganography.data.repository.FileRepositoryImpl
 import ru.normno.steganography.domain.repository.FileRepository
 import ru.normno.steganography.presentation.home.MainViewModel
 import ru.normno.steganography.presentation.multi.MultiViewModel
+import ru.normno.steganography.presentation.text.TextViewModel
 
 object AppModule {
     fun initializeKoin() {
@@ -20,6 +21,7 @@ object AppModule {
         single<FileRepository> { FileRepositoryImpl(fileKit = fileKit) }
         viewModelOf(::MainViewModel)
         viewModelOf(::MultiViewModel)
+        viewModelOf(::TextViewModel)
     }
 
     private val fileKit = FileKit
