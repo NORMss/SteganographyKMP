@@ -4,21 +4,30 @@ object WhitespaceSteganography {
 
     fun encode(message: String, coverText: String): String {
         val binary = messageToBinary(message)
-        val lines = coverText.lines()
-        val embeddedLines = lines.mapIndexed { index, line ->
-            if (index < binary.length) {
-                val hiddenChar = if (binary[index] == '0') ' ' else '\t'
-                line + hiddenChar
-            } else line
+        val words = coverText.split(" ")
+        if (binary.length > words.size - 1)
+            error("Cover text too short for this message!")
+
+        val result = StringBuilder()
+        for (i in 0 until words.size - 1) {
+            result.append(words[i])
+            val bit = if (i < binary.length) binary[i] else null
+            when (bit) {
+                '0' -> result.append(' ')
+                '1' -> result.append('\t')
+                else -> result.append(' ')
+            }
         }
-        return embeddedLines.joinToString("\n")
+        result.append(words.last())
+        return result.toString()
     }
 
     fun decode(stegoText: String): String {
-        val bits = stegoText.lines().mapNotNull { line ->
-            when (line.lastOrNull()) {
-                ' ' -> '0'
-                '\t' -> '1'
+        val tokens = stegoText.split(Regex("(?<=\\s)"))
+        val bits = tokens.mapNotNull {
+            when {
+                it == " " -> '0'
+                it == "\t" -> '1'
                 else -> null
             }
         }.joinToString("")

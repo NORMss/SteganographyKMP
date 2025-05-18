@@ -1,6 +1,7 @@
 package ru.normno.steganography.presentation.text
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -45,7 +46,8 @@ fun TextScreen(
 
     Row(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxSize(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Column(
             modifier = Modifier
@@ -90,6 +92,7 @@ fun TextScreen(
                 listOf(
                     StegoTextMethod.Whitespace,
                     StegoTextMethod.ZeroWidth,
+                    StegoTextMethod.CyrillicLatin,
                 ).forEach { method ->
                     DropdownMenuItem(
                         onClick = {
@@ -128,11 +131,8 @@ fun TextScreen(
         Column(
             modifier = Modifier
                 .weight(1f),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Spacer(
-                modifier = Modifier
-                    .height(8.dp)
-            )
             TextField(
                 value = state.secretText,
                 onValueChange = setSecretText,
@@ -161,6 +161,7 @@ fun TextScreen(
         Column(
             modifier = Modifier
                 .weight(1f),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             TextField(
                 value = state.extractedSecretText,
