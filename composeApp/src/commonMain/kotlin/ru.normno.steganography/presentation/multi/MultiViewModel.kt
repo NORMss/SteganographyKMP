@@ -111,6 +111,15 @@ class MultiViewModel(
         }
     }
 
+    fun onSaveTestInfoToCsv() {
+        viewModelScope.launch(Dispatchers.IO) {
+            fileRepository.saveTestInfoToCsv(
+                filename = "DDMMYYYY_HHmmss".format(Clock.System.now()) + "_test_info_${state.value.testsInfo.size}.csv",
+                data = state.value.testsInfo,
+            )
+        }
+    }
+
     fun onExtractAndSaveTexts() {
         viewModelScope.launch(Dispatchers.IO) {
             onExtractData()

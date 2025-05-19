@@ -132,6 +132,7 @@ fun Navigator() {
                         setEmbedText = viewModel::setEmbedText,
                         onSaveModifiedImage = viewModel::onSaveModifiedImage,
                         onSaveModifiedImages = viewModel::onSaveModifiedImages,
+                        onSaveTestInfoToCsv = viewModel::onSaveTestInfoToCsv,
                         onEmbedData = viewModel::onEmbedData,
                         modifier = Modifier
                     )

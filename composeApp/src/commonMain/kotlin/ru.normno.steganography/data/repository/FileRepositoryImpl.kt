@@ -9,6 +9,7 @@ import io.github.vinceglb.filekit.name
 import io.github.vinceglb.filekit.readBytes
 import io.github.vinceglb.filekit.saveImageToGallery
 import io.github.vinceglb.filekit.write
+import io.github.vinceglb.filekit.writeString
 import ru.normno.steganography.domain.model.FileInfo
 import ru.normno.steganography.domain.model.TestInfo
 import ru.normno.steganography.domain.repository.FileRepository
@@ -64,8 +65,13 @@ class FileRepositoryImpl(
         data: List<TestInfo>
     ) {
         val headers = listOf(
-            "psnrTotaldBm", "rsTotal", "chiSquareTotal",
-            "aumpTotal", "compressionTotal", "capacityTotalKb"
+            "psnrTotaldBm",
+            "rs (Estimated message length (in percent of pixels)(p))",
+            "rs (Estimated message length (in bytes))",
+            "chiSquareTotal",
+            "aumpTotal",
+            "compressionTotal",
+            "capacityTotalKb"
         )
 
         val lines = buildList {
@@ -73,7 +79,8 @@ class FileRepositoryImpl(
             data.forEach { item ->
                 val row = listOf(
                     item.psnrTotaldBm?.toString() ?: "",
-                    item.rsTotal.joinToString(";"),  // чтобы не путаться с запятой-разделителем CSV
+                    item.rsTotal[26].toString(),
+                    item.rsTotal[27].toString(),
                     item.chiSquareTotal?.toString() ?: "",
                     item.aumpTotal?.toString() ?: "",
                     item.compressionTotal?.toString() ?: "",
@@ -87,7 +94,7 @@ class FileRepositoryImpl(
             filename,
             "csv",
         ).also { file ->
-            file.write(lines)
+            file?.writeString(lines.joinToString("\n"))
         }
     }
 }

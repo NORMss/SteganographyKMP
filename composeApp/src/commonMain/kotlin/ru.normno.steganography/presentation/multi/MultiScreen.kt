@@ -63,6 +63,7 @@ fun MultiScreen(
     setEmbedText: (String) -> Unit,
     onSaveModifiedImage: (FileInfo) -> Unit,
     onSaveModifiedImages: () -> Unit,
+    onSaveTestInfoToCsv: () -> Unit,
     onExtractAndSaveTexts: () -> Unit,
     onSelectImageFormat: (ImageFormat) -> Unit,
     onSelectStegoMethod: (StegoImageMethod) -> Unit,
@@ -287,6 +288,18 @@ fun MultiScreen(
             ) {
                 Text(
                     text = "Save Images"
+                )
+            }
+            Spacer(
+                modifier = Modifier
+                    .height(8.dp),
+            )
+            Button(
+                onClick = onSaveTestInfoToCsv,
+                enabled = state.testsInfo.size == state.resultFilesInfo.size && state.testsInfo.isNotEmpty(),
+            ) {
+                Text(
+                    text = "Save Analise Result"
                 )
             }
         }
