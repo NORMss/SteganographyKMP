@@ -416,6 +416,81 @@ fun MultiScreen(
                                     )
                                     .size(12.dp),
                             )
+                            state.testsInfo[it].chiSquareTotal?.let { chiSquareTotal ->
+                                Spacer(
+                                    modifier = Modifier
+                                        .width(4.dp),
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .clip(CircleShape)
+                                        .background(
+                                            when (chiSquareTotal) {
+                                                in 0.0..0.5 -> Color.Green
+                                                in 0.5..1.5 -> Color.Yellow
+                                                else -> Color.Red
+                                            }
+                                        )
+                                        .size(12.dp),
+                                )
+
+                            }
+                            state.testsInfo[it].aumpTotal?.let { aumpValue ->
+                                Spacer(
+                                    modifier = Modifier
+                                        .width(4.dp),
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .clip(CircleShape)
+                                        .background(
+                                            when (aumpValue) {
+                                                in 0.0..0.009 -> Color.Green
+                                                in 0.0091..0.03 -> Color.Yellow
+                                                in 0.031..1.0 -> Color.Red
+                                                else -> Color.Gray
+                                            }
+                                        )
+                                        .size(12.dp),
+                                )
+                            }
+                            state.testsInfo[it].psnrTotaldBm?.let { psnr ->
+                                Spacer(
+                                    modifier = Modifier
+                                        .width(4.dp),
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .clip(CircleShape)
+                                        .background(
+                                            when (psnr) {
+                                                in 40.0..100.0 -> Color.Green
+                                                in 35.0..40.0 -> Color.Yellow
+                                                in 0.0..34.9 -> Color.Red
+                                                else -> Color.Gray
+                                            }
+                                        )
+                                        .size(12.dp),
+                                )
+                            }
+                            state.testsInfo[it].chiSquareTotal?.let { diff ->
+                                Spacer(
+                                    modifier = Modifier
+                                        .width(4.dp),
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .clip(CircleShape)
+                                        .background(
+                                            when (diff) {
+                                                in 0.0..0.01 -> Color.Green
+                                                in 0.01..0.05 -> Color.Yellow
+                                                else -> Color.Red
+                                            }
+                                        )
+                                        .size(12.dp),
+                                )
+                            }
                         }
                     }
                     if (showScaleImage) {
