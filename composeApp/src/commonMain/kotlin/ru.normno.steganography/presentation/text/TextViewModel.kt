@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.normno.steganography.util.StegoTextMethod
 import ru.normno.steganography.util.steganography.CyrillicLatinStego
+import ru.normno.steganography.util.steganography.LetterSteganography
 import ru.normno.steganography.util.steganography.WhitespaceSteganography
 import ru.normno.steganography.util.steganography.ZeroWidthSteganography
 
@@ -50,7 +51,7 @@ class TextViewModel : ViewModel() {
                     zeroWidthSteganographyEmbed()
                 }
 
-                StegoTextMethod.CyrillicLatin -> {
+                StegoTextMethod.Letter -> {
                     cyrillicLatinSteganographyEmbed()
                 }
             }
@@ -68,7 +69,7 @@ class TextViewModel : ViewModel() {
                     zeroWidthSteganographyExtract()
                 }
 
-                StegoTextMethod.CyrillicLatin -> {
+                StegoTextMethod.Letter -> {
                     cyrillicLatinSteganographyExtract()
                 }
             }
@@ -76,11 +77,11 @@ class TextViewModel : ViewModel() {
     }
 
     private suspend fun cyrillicLatinSteganographyEmbed() {
-        embedData(CyrillicLatinStego::encode)
+        embedData(LetterSteganography::encode)
     }
 
     private suspend fun cyrillicLatinSteganographyExtract() {
-        extractData(CyrillicLatinStego::decode)
+        extractData(LetterSteganography::decode)
     }
 
     private suspend fun whitespaceSteganographyEmbed() {
@@ -116,7 +117,7 @@ class TextViewModel : ViewModel() {
 
     private suspend fun extractData(method: (String) -> String) {
         method(
-            state.value.secretText,
+            state.value.textWithSecret,
         ).also { extractedSecretText ->
             state.update {
                 it.copy(

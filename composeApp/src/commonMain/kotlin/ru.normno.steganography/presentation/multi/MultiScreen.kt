@@ -49,6 +49,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import coil3.compose.AsyncImage
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import ru.normno.steganography.domain.model.FileInfo
 import ru.normno.steganography.presentation.multi.component.ImageCard
 import ru.normno.steganography.util.ImageFormat
@@ -545,4 +546,21 @@ fun MultiScreen(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun PreviewMultiScreen() {
+    MultiScreen(
+        state = MultiState(),
+        onPickImages = {},
+        onEmbedData = {},
+        setEmbedText = {},
+        onSaveModifiedImage = {},
+        onSaveModifiedImages = {},
+        onSaveTestInfoToCsv = {},
+        onExtractAndSaveTexts = {},
+        onSelectImageFormat = {},
+        onSelectStegoMethod = {},
+    )
 }

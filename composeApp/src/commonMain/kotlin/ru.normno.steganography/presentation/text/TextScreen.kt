@@ -92,7 +92,7 @@ fun TextScreen(
                 listOf(
                     StegoTextMethod.Whitespace,
                     StegoTextMethod.ZeroWidth,
-                    StegoTextMethod.CyrillicLatin,
+                    StegoTextMethod.Letter,
                 ).forEach { method ->
                     DropdownMenuItem(
                         onClick = {
