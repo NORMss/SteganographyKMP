@@ -241,7 +241,6 @@ class MultiViewModel(
                 }
             }
         }
-        println(state.value.testsInfo.first())
     }
 
     private fun visualAttack() {

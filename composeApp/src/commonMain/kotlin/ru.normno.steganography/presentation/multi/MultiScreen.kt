@@ -2,6 +2,7 @@ package ru.normno.steganography.presentation.multi
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -314,6 +315,7 @@ fun MultiScreen(
                     .widthIn(max = 512.dp)
                     .padding(horizontal = 16.dp),
                 contentPadding = PaddingValues(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 items(
                     count = state.sourceFilesInfo.size,
@@ -343,6 +345,7 @@ fun MultiScreen(
                     .widthIn(max = 512.dp)
                     .padding(horizontal = 16.dp),
                 contentPadding = PaddingValues(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 items(
                     count = state.resultFilesInfo.size,
