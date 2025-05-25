@@ -135,6 +135,7 @@ fun Navigator() {
                         onSaveTestInfoToCsv = viewModel::onSaveTestInfoToCsv,
                         onEmbedData = viewModel::onEmbedData,
                         modifier = Modifier
+                            .padding(paddingValues),
                     )
                 }
                 composable<Route.Text> {
@@ -146,11 +147,15 @@ fun Navigator() {
                         onSelectStegoMethod = viewModel::onSelectMethod,
                         setSecretText = viewModel::setSecretText,
                         setOriginalText = viewModel::setOriginalText,
+                        setTextWithSecret = viewModel::setTextWithSecret,
                         state = state,
                     )
                 }
                 composable<Route.About> {
-                    AboutScreen()
+                    AboutScreen(
+                        modifier = Modifier
+                            .padding(paddingValues),
+                    )
                 }
             }
         }

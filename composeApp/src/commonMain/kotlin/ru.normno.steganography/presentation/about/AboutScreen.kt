@@ -11,13 +11,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import org.jetbrains.compose.resources.vectorResource
 import steganography.composeapp.generated.resources.Res
+import steganography.composeapp.generated.resources.github
 
 @Composable
 fun AboutScreen(
     modifier: Modifier = Modifier,
 ) {
+    val uriHandler = LocalUriHandler.current
+
     Column(
         modifier = modifier
             .fillMaxSize(),
@@ -41,8 +45,8 @@ fun AboutScreen(
                     contentDescription = null,
                     modifier = Modifier
                         .clickable {
-
-                        }
+                            uriHandler.openUri("https://github.com/NORMss/SteganographyKMP")
+                        },
                 )
             }
         }

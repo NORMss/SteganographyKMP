@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.normno.steganography.util.StegoTextMethod
-import ru.normno.steganography.util.steganography.CyrillicLatinStego
 import ru.normno.steganography.util.steganography.LetterSteganography
 import ru.normno.steganography.util.steganography.WhitespaceSteganography
 import ru.normno.steganography.util.steganography.ZeroWidthSteganography
@@ -28,6 +27,14 @@ class TextViewModel : ViewModel() {
         state.update {
             it.copy(
                 originalText = text,
+            )
+        }
+    }
+
+    fun setTextWithSecret(text: String) {
+        state.update {
+            it.copy(
+                textWithSecret = text,
             )
         }
     }

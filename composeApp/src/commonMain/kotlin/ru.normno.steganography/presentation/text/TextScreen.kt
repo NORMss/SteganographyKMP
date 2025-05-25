@@ -39,6 +39,7 @@ fun TextScreen(
     onSelectStegoMethod: (StegoTextMethod) -> Unit,
     setSecretText: (String) -> Unit,
     setOriginalText: (String) -> Unit,
+    setTextWithSecret: (String) -> Unit,
 ) {
     var isSelectStegoMethod by remember {
         mutableStateOf(false)
@@ -179,9 +180,7 @@ fun TextScreen(
             )
             TextField(
                 value = state.textWithSecret,
-                onValueChange = {
-
-                },
+                onValueChange = setTextWithSecret,
                 placeholder = {
                     Text(
                         text = "Text with secret"
